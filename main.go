@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"garagesvc/controller"
 	"time"
 
 	"github.com/labstack/echo"
@@ -40,7 +41,8 @@ func main() {
 	//Employee
 	// e.GET("/employees", GetEmployees)
 	// e.GET("/employees/:id", GetEmployee)
-	// e.POST("/employees", CreateEmployee)
+	e.POST("/employees", controller.EmployeeCreate)
+	e.POST("/employees/login", controller.EmployeeLogin)
 	// e.PATCH("/employees/:id", UpdateEmployee)
 	// e.DELETE("/employees/:id", DeleteEmployee)
 
@@ -51,4 +53,6 @@ func main() {
 	// e.POST("/books", CreateBook)
 	// e.PATCH("/books/:id", UpdateBook)
 	// e.DELETE("/books/:id", DeleteBook)
+
+	e.Start(":9998")
 }
