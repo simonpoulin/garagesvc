@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"garagesvc/controller"
+	controller "garagesvc/controllers"
+	validator "garagesvc/validators"
 	"time"
 
 	"github.com/labstack/echo"
@@ -41,8 +42,8 @@ func main() {
 	//Employee
 	// e.GET("/employees", GetEmployees)
 	// e.GET("/employees/:id", GetEmployee)
-	e.POST("/employees", controller.EmployeeCreate)
-	e.POST("/employees/login", controller.EmployeeLogin)
+	e.POST("/employees", controller.EmployeeCreate, validator.EmployeeCreate)
+	e.POST("/employees/login", controller.EmployeeLogin, validator.EmployeeLogin)
 	// e.PATCH("/employees/:id", UpdateEmployee)
 	// e.DELETE("/employees/:id", DeleteEmployee)
 
