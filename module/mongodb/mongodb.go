@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -15,7 +16,11 @@ var (
 
 // Connect ...
 func Connect() {
-
+	// Load dotenv for database connection
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
 	// Get connection
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(os.Getenv("DATABASE_CONNECTION")))
 	if err != nil {
