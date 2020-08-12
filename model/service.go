@@ -1,7 +1,8 @@
-package models
+package model
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
+// Service ...
 type Service struct {
 	ID        primitive.ObjectID `json:"_id" bson:"_id"`
 	CompanyID primitive.ObjectID `json:"company_id" bson:"company_id" validator:"eq=24"`

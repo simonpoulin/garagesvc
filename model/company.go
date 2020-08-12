@@ -1,9 +1,10 @@
-package models
+package model
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+//Company ...
 type Company struct {
 	ID       primitive.ObjectID `json:"_id" bson:"_id"`
 	Name     string             `json:"name" bson:"name" validator:"required, max=20, alphaunicode"`
