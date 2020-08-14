@@ -23,3 +23,11 @@ type EmployeeCreatePayload struct {
 	Phone    string `json:"phone" bson:"phone" valid:"required, type(string), stringlength(10|10)"`
 	Password string `json:"password" bson:"password" valid:"required, type(string), stringlength(6|20)"`
 }
+
+// EmployeeUpdatePayload ...
+type EmployeeUpdatePayload struct {
+	Name     string `json:"name" bson:"name" valid:"required, stringlength(1|20)"`
+	Phone    string `json:"phone" bson:"phone" valid:"required, type(string), stringlength(10|10)"`
+	Password string `json:"password" bson:"password" valid:"required, type(string), stringlength(6|20)"`
+	Active   bool   `json:"active" bson:"active" valid:"required, type(bool)"`
+}

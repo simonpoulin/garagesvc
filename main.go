@@ -1,12 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"garagesvc/module/mongodb"
 	"garagesvc/route"
 	"log"
 	"os"
-	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
@@ -18,7 +16,11 @@ func init() {
 }
 
 func main() {
-	fmt.Println(time.Now())
+	//Load dotenv for port option
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	//Echo
 	e := echo.New()
@@ -29,12 +31,6 @@ func main() {
 	//Add routers
 	route.Bootstrap(e)
 
-	// Load dotenv for port option
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(os.Getenv("PORT"))
 	//Open port
 	e.Start(os.Getenv("PORT"))
 }

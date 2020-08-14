@@ -11,3 +11,18 @@ type Service struct {
 	Address   string             `json:"address" bson:"address" validator:"required, max=50"`
 	Active    bool               `json:"active" bson:"active"`
 }
+
+// ServiceCreatePayload ...
+type ServiceCreatePayload struct {
+	Name     string   `json:"name" bson:"name" valid:"required, stringlength(1|20)"`
+	Location Location `json:"location" bson:"location"`
+	Address  string   `json:"address" bson:"address" validator:"required, stringlength(1|50)"`
+}
+
+// ServiceUpdatePayload ...
+type ServiceUpdatePayload struct {
+	Name     string   `json:"name" bson:"name" valid:"required, stringlength(1|20)"`
+	Location Location `json:"location" bson:"location"`
+	Address  string   `json:"address" bson:"address" validator:"required, stringlength(1|50)"`
+	Active   bool     `json:"active" bson:"active" valid:"required, type(bool)"`
+}

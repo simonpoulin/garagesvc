@@ -1,18 +1,20 @@
 package validator
 
 import (
+	"errors"
 	"garagesvc/model"
+	"garagesvc/service"
 	"garagesvc/util"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo"
 )
 
-// EmployeeCreate ...
-func EmployeeCreate(next echo.HandlerFunc) echo.HandlerFunc {
+// ServiceCreate ...
+func ServiceCreate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			payload model.EmployeeCreatePayload
+			payload model.ServiceCreatePayload
 		)
 
 		//Bind and parse to struct
@@ -32,20 +34,20 @@ func EmployeeCreate(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// EmployeeLogin ...
-func EmployeeLogin(next echo.HandlerFunc) echo.HandlerFunc {
+// ServiceUpdate ...
+func ServiceUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			payload model.EmployeeLoginPayload
+			payload model.ServiceUpdatePayload
 		)
 
 		//Bind and parse to struct
 		if err := c.Bind(&payload); err != nil {
 			return util.Response400(c, err.Error(), nil)
 		}
+		_, err := govalidator.ValidateStruct(payload)
 
 		//Validate struct
-		_, err := govalidator.ValidateStruct(payload)
 		if err != nil {
 			return util.Response400(c, err.Error(), nil)
 		}
@@ -56,26 +58,25 @@ func EmployeeLogin(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// EmployeeUpdate ...
-func EmployeeUpdate(next echo.HandlerFunc) echo.HandlerFunc {
+// ServiceCheck ...
+func ServiceCheck(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			payload model.EmployeeUpdatePayload
+			serviceID = c.Param("serviceID")
 		)
 
-		//Bind and parse to struct
-		if err := c.Bind(&payload); err != nil {
-			return util.Response400(c, err.Error(), nil)
-		}
-		_, err := govalidator.ValidateStruct(payload)
-
-		//Validate struct
+		//Validate service ID
+		svc, err := service.ServiceDetail(serviceID)
 		if err != nil {
 			return util.Response400(c, err.Error(), nil)
 		}
 
-		//Set body and move to next process
-		c.Set("body", payload)
+		//Check service status
+		if !svc.Active {
+			err = errors.New("service not active")
+			return util.Response400(c, err.Error(), nil)
+		}
+
 		return next(c)
 	}
 }

@@ -10,10 +10,12 @@ import (
 func employee(e *echo.Echo) {
 	group := e.Group("/employees")
 
-	// e.GET("/employees", GetEmployees)
-	// e.GET("/employees/:id", GetEmployee)
+	group.GET("/", controller.EmployeeList)
+	group.GET("/:id", controller.EmployeeDetail)
+	group.GET("/active/:active", controller.EmployeeListByActiveState)
 	group.POST("/", controller.EmployeeCreate, validator.EmployeeCreate)
 	group.POST("/login", controller.EmployeeLogin, validator.EmployeeLogin)
-	// e.PATCH("/employees/:id", UpdateEmployee)
-	// e.DELETE("/employees/:id", DeleteEmployee)
+	group.PATCH("/:id", controller.EmployeeUpdate, validator.EmployeeUpdate)
+	group.PATCH("/:id/active", controller.EmployeeChangeActive)
+	group.DELETE("/:id", controller.EmployeeDelete)
 }

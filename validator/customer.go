@@ -8,11 +8,11 @@ import (
 	"github.com/labstack/echo"
 )
 
-// EmployeeCreate ...
-func EmployeeCreate(next echo.HandlerFunc) echo.HandlerFunc {
+// CustomerValid ...
+func CustomerValid(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			payload model.EmployeeCreatePayload
+			payload model.CustomerPayload
 		)
 
 		//Bind and parse to struct
@@ -32,11 +32,11 @@ func EmployeeCreate(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// EmployeeLogin ...
-func EmployeeLogin(next echo.HandlerFunc) echo.HandlerFunc {
+// CustomerLogin ...
+func CustomerLogin(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			payload model.EmployeeLoginPayload
+			payload model.CustomerLoginPayload
 		)
 
 		//Bind and parse to struct
@@ -46,30 +46,6 @@ func EmployeeLogin(next echo.HandlerFunc) echo.HandlerFunc {
 
 		//Validate struct
 		_, err := govalidator.ValidateStruct(payload)
-		if err != nil {
-			return util.Response400(c, err.Error(), nil)
-		}
-
-		//Set body and move to next process
-		c.Set("body", payload)
-		return next(c)
-	}
-}
-
-// EmployeeUpdate ...
-func EmployeeUpdate(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		var (
-			payload model.EmployeeUpdatePayload
-		)
-
-		//Bind and parse to struct
-		if err := c.Bind(&payload); err != nil {
-			return util.Response400(c, err.Error(), nil)
-		}
-		_, err := govalidator.ValidateStruct(payload)
-
-		//Validate struct
 		if err != nil {
 			return util.Response400(c, err.Error(), nil)
 		}
