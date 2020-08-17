@@ -11,16 +11,15 @@ import (
 // ServiceCreate ...
 func ServiceCreate(c echo.Context) error {
 	var (
-		companyID = c.Param("companyID")
-		payload   = c.Get("body").(model.ServiceCreatePayload)
+		payload = c.Get("body").(model.ServiceCreatePayload)
 	)
 
 	//Create service
-	result, err := service.ServiceCreate(companyID, payload)
+	result, err := service.ServiceCreate(payload)
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -38,7 +37,7 @@ func ServiceDetail(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -47,16 +46,31 @@ func ServiceDetail(c echo.Context) error {
 
 // ServiceList ...
 func ServiceList(c echo.Context) error {
+
+	//Get service list
+	result, err := service.ServiceList()
+
+	//If error, return 400
+	if err != nil {
+		return util.Response400(c, err.Error())
+	}
+
+	//Return 200
+	return util.Response200(c, "", result)
+}
+
+// ServiceListByCompanyID ...
+func ServiceListByCompanyID(c echo.Context) error {
 	var (
 		companyID = c.Param("companyID")
 	)
 
 	//Get service list
-	result, err := service.ServiceList(companyID)
+	result, err := service.ServiceListByCompanyID(companyID)
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -74,7 +88,7 @@ func ServiceListByActiveState(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -93,7 +107,7 @@ func ServiceUpdate(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -111,7 +125,7 @@ func ServiceChangeActive(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -129,7 +143,7 @@ func ServiceDelete(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200

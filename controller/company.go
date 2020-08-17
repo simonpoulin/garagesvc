@@ -19,7 +19,7 @@ func CompanyCreate(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -37,7 +37,7 @@ func CompanyDetail(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -52,7 +52,7 @@ func CompanyList(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -71,7 +71,7 @@ func CompanyUpdate(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -89,7 +89,7 @@ func CompanyChangeActive(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -107,7 +107,7 @@ func CompanyDelete(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200

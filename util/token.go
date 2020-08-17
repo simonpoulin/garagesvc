@@ -27,7 +27,7 @@ func TokenEncode(ID string) (tokenString string, err error) {
 	claims := &UserClaim{
 		ID,
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Minute * 15).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour).Unix(),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

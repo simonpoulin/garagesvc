@@ -19,7 +19,7 @@ func EmployeeCreate(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -37,7 +37,7 @@ func EmployeeLogin(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -55,7 +55,7 @@ func EmployeeDetail(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -70,7 +70,7 @@ func EmployeeList(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -88,7 +88,7 @@ func EmployeeListByActiveState(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -107,7 +107,7 @@ func EmployeeUpdate(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -125,7 +125,7 @@ func EmployeeChangeActive(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -143,7 +143,7 @@ func EmployeeDelete(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200

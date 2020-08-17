@@ -24,13 +24,23 @@ func Response200(c echo.Context, message string, data interface{}) error {
 }
 
 // Response400 ...
-func Response400(c echo.Context, message string, data interface{}) error {
+func Response400(c echo.Context, message string) error {
 	if message == "" {
 		message = "Không hợp lệ!"
 	}
 
 	return c.JSON(http.StatusOK, response{
 		Message: message,
-		Data:    data,
+	})
+}
+
+// Response401 ...
+func Response401(c echo.Context, message string) error {
+	if message == "" {
+		message = "Bạn không có quyền truy cập!"
+	}
+
+	return c.JSON(http.StatusUnauthorized, response{
+		Message: message,
 	})
 }

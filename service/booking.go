@@ -18,7 +18,7 @@ func BookingCreate(payload model.BookingCreatePayload) (bookingID string, err er
 	)
 
 	//Set data for new booking
-	booking.UserID, err = primitive.ObjectIDFromHex(payload.UserID)
+	booking.CustomerID, err = primitive.ObjectIDFromHex(payload.CustomerID)
 	if err != nil {
 		return
 	}
@@ -94,6 +94,78 @@ func BookingListByStatus(status string) (bookingList []model.Booking, err error)
 
 	//Set filter
 	filter := bson.M{"status": status}
+
+	//Get bookings
+	cur, err := bookingCol.Find(ctxt, filter)
+	if err != nil {
+		return
+	}
+	defer cur.Close(ctxt)
+
+	//Add bookings to list
+	for cur.Next(ctxt) {
+		var result model.Booking
+		err = cur.Decode(&result)
+		if err != nil {
+			return nil, err
+		}
+		bookingList = append(bookingList, result)
+	}
+	if err = cur.Err(); err != nil {
+		return nil, err
+	}
+	return
+}
+
+// BookingListByServiceID ...
+func BookingListByServiceID(serviceID string) (bookingList []model.Booking, err error) {
+	var (
+		bookingCol = mongodb.BookingCol()
+		ctxt       = context.Background()
+	)
+
+	//Set filter
+	svcID, err := primitive.ObjectIDFromHex(serviceID)
+	if err != nil {
+		return
+	}
+	filter := bson.M{"service_id": svcID}
+
+	//Get bookings
+	cur, err := bookingCol.Find(ctxt, filter)
+	if err != nil {
+		return
+	}
+	defer cur.Close(ctxt)
+
+	//Add bookings to list
+	for cur.Next(ctxt) {
+		var result model.Booking
+		err = cur.Decode(&result)
+		if err != nil {
+			return nil, err
+		}
+		bookingList = append(bookingList, result)
+	}
+	if err = cur.Err(); err != nil {
+		return nil, err
+	}
+	return
+}
+
+// BookingListByCustomerID ...
+func BookingListByCustomerID(customerID string) (bookingList []model.Booking, err error) {
+	var (
+		bookingCol = mongodb.BookingCol()
+		ctxt       = context.Background()
+	)
+
+	//Set filter
+	ctmID, err := primitive.ObjectIDFromHex(customerID)
+	if err != nil {
+		return
+	}
+	filter := bson.M{"customer_id": ctmID}
 
 	//Get bookings
 	cur, err := bookingCol.Find(ctxt, filter)

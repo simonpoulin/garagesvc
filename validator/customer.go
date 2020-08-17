@@ -17,13 +17,13 @@ func CustomerValid(next echo.HandlerFunc) echo.HandlerFunc {
 
 		//Bind and parse to struct
 		if err := c.Bind(&payload); err != nil {
-			return util.Response400(c, err.Error(), nil)
+			return util.Response400(c, err.Error())
 		}
 		_, err := govalidator.ValidateStruct(payload)
 
 		//Validate struct
 		if err != nil {
-			return util.Response400(c, err.Error(), nil)
+			return util.Response400(c, err.Error())
 		}
 
 		//Set body and move to next process
@@ -41,13 +41,13 @@ func CustomerLogin(next echo.HandlerFunc) echo.HandlerFunc {
 
 		//Bind and parse to struct
 		if err := c.Bind(&payload); err != nil {
-			return util.Response400(c, err.Error(), nil)
+			return util.Response400(c, err.Error())
 		}
 
 		//Validate struct
 		_, err := govalidator.ValidateStruct(payload)
 		if err != nil {
-			return util.Response400(c, err.Error(), nil)
+			return util.Response400(c, err.Error())
 		}
 
 		//Set body and move to next process

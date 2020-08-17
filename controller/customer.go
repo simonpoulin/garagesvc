@@ -19,7 +19,7 @@ func CustomerCreate(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -37,7 +37,7 @@ func CustomerLogin(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -55,7 +55,7 @@ func CustomerDetail(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -70,7 +70,7 @@ func CustomerList(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -89,7 +89,7 @@ func CustomerUpdate(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -107,7 +107,7 @@ func CustomerDelete(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200

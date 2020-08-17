@@ -1,20 +1,18 @@
 package validator
 
 import (
-	"errors"
 	"garagesvc/model"
-	"garagesvc/service"
 	"garagesvc/util"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo"
 )
 
-// ServiceCreate ...
-func ServiceCreate(next echo.HandlerFunc) echo.HandlerFunc {
+// BookingCreate ...
+func BookingCreate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			payload model.ServiceCreatePayload
+			payload model.BookingCreatePayload
 		)
 
 		//Bind and parse to struct
@@ -34,11 +32,11 @@ func ServiceCreate(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// ServiceUpdate ...
-func ServiceUpdate(next echo.HandlerFunc) echo.HandlerFunc {
+// BookingUpdate ...
+func BookingUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			payload model.ServiceUpdatePayload
+			payload model.BookingUpdatePayload
 		)
 
 		//Bind and parse to struct
@@ -54,29 +52,6 @@ func ServiceUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 
 		//Set body and move to next process
 		c.Set("body", payload)
-		return next(c)
-	}
-}
-
-// ServiceCheck ...
-func ServiceCheck(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		var (
-			serviceID = c.Param("serviceID")
-		)
-
-		//Validate service ID
-		svc, err := service.ServiceDetail(serviceID)
-		if err != nil {
-			return util.Response400(c, err.Error())
-		}
-
-		//Check service status
-		if !svc.Active {
-			err = errors.New("service not active")
-			return util.Response400(c, err.Error())
-		}
-
 		return next(c)
 	}
 }

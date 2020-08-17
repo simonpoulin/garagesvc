@@ -1,6 +1,7 @@
 package route
 
 import (
+	"garagesvc/auth"
 	"garagesvc/controller"
 	"garagesvc/validator"
 
@@ -8,26 +9,17 @@ import (
 )
 
 func booking(e *echo.Echo) {
-	// Customer
-	customerGroup := e.Group("/:customerID/bookings")
+	group := e.Group("/bookings")
 
-	customerGroup.GET("/", controller.BookingList)
-	customerGroup.GET("/:id", controller.BookingDetail)
-	customerGroup.GET("/:id/status/:status", controller.BookingListByStatus)
-	customerGroup.POST("/", controller.BookingCreate)
-	customerGroup.PATCH("/:id", controller.BookingUpdate)
-	customerGroup.DELETE("/:id", controller.BookingDelete)
+	group.Use(auth.IsLoggedIn)
 
-	// Service
-	serviceGroup := e.Group("/companies/:companyID/services/:serviceID/bookings")
-
-	serviceGroup.Use(validator.ServiceCheck, validator.CompanyCheck)
-
-	serviceGroup.GET("/", controller.BookingList)
-	serviceGroup.GET("/:id", controller.BookingDetail)
-	serviceGroup.GET("/status/:status", controller.BookingListByStatus)
-	serviceGroup.POST("/", controller.BookingCreate)
-	serviceGroup.PATCH("/:id", controller.BookingUpdate)
-	serviceGroup.PATCH("/:id/status/:status", controller.BookingChangeStatus)
-	serviceGroup.DELETE("/:id", controller.BookingDelete)
+	group.GET("/", controller.BookingList)
+	group.GET("/:id", controller.BookingDetail)
+	group.GET("/status/:status", controller.BookingListByStatus)
+	group.GET("/service/:serviceid", controller.BookingListByServiceID)
+	group.GET("/customer/:customerid", controller.BookingListByCustomerID)
+	group.POST("/", controller.BookingCreate, validator.BookingCreate)
+	group.PATCH("/:id", controller.BookingUpdate, validator.BookingUpdate)
+	group.PATCH("/:id/status/:status", controller.BookingChangeStatus)
+	group.DELETE("/:id", controller.BookingDelete)
 }

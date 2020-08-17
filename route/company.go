@@ -1,6 +1,7 @@
 package route
 
 import (
+	"garagesvc/auth"
 	"garagesvc/controller"
 	"garagesvc/validator"
 
@@ -9,6 +10,8 @@ import (
 
 func company(e *echo.Echo) {
 	group := e.Group("/companies")
+
+	group.Use(auth.IsLoggedIn)
 
 	group.GET("/", controller.CompanyList)
 	group.GET("/:id", controller.CompanyDetail)

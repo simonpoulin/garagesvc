@@ -19,7 +19,7 @@ func BookingCreate(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -37,7 +37,7 @@ func BookingDetail(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -52,7 +52,7 @@ func BookingList(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -70,7 +70,43 @@ func BookingListByStatus(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
+	}
+
+	//Return 200
+	return util.Response200(c, "", result)
+}
+
+// BookingListByServiceID ...
+func BookingListByServiceID(c echo.Context) error {
+	var (
+		serviceID = c.Param("serviceid")
+	)
+
+	//Get booking list
+	result, err := service.BookingListByServiceID(serviceID)
+
+	//If error, return 400
+	if err != nil {
+		return util.Response400(c, err.Error())
+	}
+
+	//Return 200
+	return util.Response200(c, "", result)
+}
+
+// BookingListByCustomerID ...
+func BookingListByCustomerID(c echo.Context) error {
+	var (
+		customerID = c.Param("customerid")
+	)
+
+	//Get booking list
+	result, err := service.BookingListByCustomerID(customerID)
+
+	//If error, return 400
+	if err != nil {
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -89,7 +125,7 @@ func BookingUpdate(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -108,7 +144,7 @@ func BookingChangeStatus(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200
@@ -126,7 +162,7 @@ func BookingDelete(c echo.Context) error {
 
 	//If error, return 400
 	if err != nil {
-		return util.Response400(c, err.Error(), nil)
+		return util.Response400(c, err.Error())
 	}
 
 	//Return 200

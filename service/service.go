@@ -10,7 +10,7 @@ import (
 )
 
 // ServiceCreate ...
-func ServiceCreate(companyID string, payload model.ServiceCreatePayload) (serviceID string, err error) {
+func ServiceCreate(payload model.ServiceCreatePayload) (serviceID string, err error) {
 	var (
 		service    model.Service
 		serviceCol = mongodb.ServiceCol()
@@ -18,7 +18,7 @@ func ServiceCreate(companyID string, payload model.ServiceCreatePayload) (servic
 	)
 
 	//Set data for new service
-	service.CompanyID, err = primitive.ObjectIDFromHex(companyID)
+	service.CompanyID, err = primitive.ObjectIDFromHex(payload.CompanyID)
 	if err != nil {
 		return
 	}
@@ -54,14 +54,47 @@ func ServiceDetail(id string) (e model.Service, err error) {
 }
 
 // ServiceList ...
-func ServiceList(companyID string) (serviceList []model.Service, err error) {
+func ServiceList() (serviceList []model.Service, err error) {
 	var (
 		serviceCol = mongodb.ServiceCol()
 		ctxt       = context.Background()
 	)
 
 	//Get services by company ID
-	filter := bson.M{"company_id": companyID}
+	cur, err := serviceCol.Find(ctxt, bson.M{})
+	if err != nil {
+		return
+	}
+	defer cur.Close(ctxt)
+
+	//Add services to list
+	for cur.Next(ctxt) {
+		var result model.Service
+		err = cur.Decode(&result)
+		if err != nil {
+			return nil, err
+		}
+		serviceList = append(serviceList, result)
+	}
+	if err = cur.Err(); err != nil {
+		return nil, err
+	}
+	return
+}
+
+// ServiceListByCompanyID ...
+func ServiceListByCompanyID(companyID string) (serviceList []model.Service, err error) {
+	var (
+		serviceCol = mongodb.ServiceCol()
+		ctxt       = context.Background()
+	)
+
+	//Get services by company ID
+	cpnID, err := primitive.ObjectIDFromHex(companyID)
+	if err != nil {
+		return
+	}
+	filter := bson.M{"company_id": cpnID}
 	cur, err := serviceCol.Find(ctxt, filter)
 	if err != nil {
 		return

@@ -19,13 +19,13 @@ func CompanyCreate(next echo.HandlerFunc) echo.HandlerFunc {
 
 		//Bind and parse to struct
 		if err := c.Bind(&payload); err != nil {
-			return util.Response400(c, err.Error(), nil)
+			return util.Response400(c, err.Error())
 		}
 		_, err := govalidator.ValidateStruct(payload)
 
 		//Validate struct
 		if err != nil {
-			return util.Response400(c, err.Error(), nil)
+			return util.Response400(c, err.Error())
 		}
 
 		//Set body and move to next process
@@ -43,13 +43,13 @@ func CompanyUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 
 		//Bind and parse to struct
 		if err := c.Bind(&payload); err != nil {
-			return util.Response400(c, err.Error(), nil)
+			return util.Response400(c, err.Error())
 		}
 		_, err := govalidator.ValidateStruct(payload)
 
 		//Validate struct
 		if err != nil {
-			return util.Response400(c, err.Error(), nil)
+			return util.Response400(c, err.Error())
 		}
 
 		//Set body and move to next process
@@ -68,13 +68,13 @@ func CompanyCheck(next echo.HandlerFunc) echo.HandlerFunc {
 		//Validate company ID
 		company, err := service.CompanyDetail(companyID)
 		if err != nil {
-			return util.Response400(c, err.Error(), nil)
+			return util.Response400(c, err.Error())
 		}
 
 		//Check company status
 		if !company.Active {
 			err = errors.New("company not active")
-			return util.Response400(c, err.Error(), nil)
+			return util.Response400(c, err.Error())
 		}
 
 		return next(c)
