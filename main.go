@@ -1,26 +1,32 @@
 package main
 
 import (
+	"garagesvc/config"
 	"garagesvc/module/mongodb"
 	"garagesvc/route"
-	"log"
-	"os"
 
-	"github.com/joho/godotenv"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	_ "garagesvc/docs"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
+// @title Garage Service API
+// @version 1.0.0
+// @description Documentation of Garage Service API
+//
+// @host localhost:9999
+// @BasePath /
+
 func init() {
+	config.Init()
 	mongodb.Connect()
 }
 
 func main() {
 	//Load dotenv for port option
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal(err)
-	}
+	env := config.GetENV()
 
 	//Echo
 	e := echo.New()
@@ -28,9 +34,12 @@ func main() {
 	//CORS
 	e.Use(middleware.CORS())
 
+	//Swagger
+	e.GET("/spec/*", echoSwagger.WrapHandler)
+
 	//Add routers
 	route.Bootstrap(e)
 
 	//Open port
-	e.Start(os.Getenv("PORT"))
+	e.Start(env.Port)
 }

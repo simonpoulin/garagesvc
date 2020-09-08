@@ -1,21 +1,16 @@
 package service
 
 import (
-	"context"
+	"garagesvc/dao"
 	"garagesvc/model"
-	"garagesvc/module/mongodb"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // CompanyCreate ...
-func CompanyCreate(payload model.CompanyCreatePayload) (companyID string, err error) {
-	var (
-		company    model.Company
-		companyCol = mongodb.CompanyCol()
-		ctxt       = context.Background()
-	)
+func CompanyCreate(payload model.CompanyCreatePayload) (companyID primitive.ObjectID, err error) {
+	var company model.Company
 
 	//Set data for new company
 	company.ID = primitive.NewObjectID()
@@ -25,72 +20,35 @@ func CompanyCreate(payload model.CompanyCreatePayload) (companyID string, err er
 	company.Location = payload.Location
 
 	//Insert to database
-	_, err = companyCol.InsertOne(ctxt, company)
-	companyID = company.ID.Hex()
+	err = dao.CompanyCreate(company)
+	companyID = company.ID
 	return
 }
 
 // CompanyDetail ...
-func CompanyDetail(id string) (e model.Company, err error) {
-	var (
-		companyCol = mongodb.CompanyCol()
-		ctxt       = context.Background()
-	)
+func CompanyDetail(id primitive.ObjectID) (company model.Company, err error) {
 
 	//Set filter
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": id}
 
 	//Looking for company from database
-	err = companyCol.FindOne(ctxt, filter).Decode(&e)
+	company, err = dao.CompanyFindOne(filter)
 	return
 }
 
 // CompanyList ...
 func CompanyList() (companyList []model.Company, err error) {
-	var (
-		companyCol = mongodb.CompanyCol()
-		ctxt       = context.Background()
-	)
 
 	//Get companys
-	cur, err := companyCol.Find(ctxt, bson.M{})
-	if err != nil {
-		return
-	}
-	defer cur.Close(ctxt)
-
-	//Add companys to list
-	for cur.Next(ctxt) {
-		var result model.Company
-		err = cur.Decode(&result)
-		if err != nil {
-			return nil, err
-		}
-		companyList = append(companyList, result)
-	}
-	if err = cur.Err(); err != nil {
-		return nil, err
-	}
+	companyList, err = dao.CompanyFind(bson.M{})
 	return
 }
 
 // CompanyUpdate ...
-func CompanyUpdate(id string, payload model.CompanyUpdatePayload) (companyID string, err error) {
-	var (
-		companyCol = mongodb.CompanyCol()
-		ctxt       = context.Background()
-	)
+func CompanyUpdate(id primitive.ObjectID, payload model.CompanyUpdatePayload) (companyID primitive.ObjectID, err error) {
 
 	//Set filter and data
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": id}
 	update := bson.M{"$set": bson.M{
 		"active":   payload.Active,
 		"address":  payload.Address,
@@ -99,10 +57,7 @@ func CompanyUpdate(id string, payload model.CompanyUpdatePayload) (companyID str
 	}}
 
 	//Update company
-	_, err = companyCol.UpdateOne(ctxt, filter, update)
-	if err != nil {
-		return
-	}
+	err = dao.CompanyUpdateOne(filter, update)
 
 	//Return data
 	companyID = id
@@ -110,47 +65,33 @@ func CompanyUpdate(id string, payload model.CompanyUpdatePayload) (companyID str
 }
 
 // CompanyChangeActive ...
-func CompanyChangeActive(id string) (companyStatus bool, err error) {
-	var (
-		company    model.Company
-		companyCol = mongodb.CompanyCol()
-		ctxt       = context.Background()
-	)
+func CompanyChangeActive(id primitive.ObjectID) (companyID primitive.ObjectID, err error) {
 
-	//Set filter and active state data
-	_id, err := primitive.ObjectIDFromHex(id)
+	//Set filter
+	filter := bson.M{"_id": id}
+	company, err := dao.CompanyFindOne(filter)
 	if err != nil {
 		return
 	}
-	filter := bson.M{"_id": _id}
+
+	//Set active state data
 	update := bson.M{"$set": bson.M{"active": !company.Active}}
 
 	//Update company
-	_, err = companyCol.UpdateOne(ctxt, filter, update)
-	if err != nil {
-		return
-	}
+	err = dao.CompanyUpdateOne(filter, update)
 
 	//Return data
-	companyStatus = !company.Active
+	companyID = company.ID
 	return
 }
 
 // CompanyDelete ...
-func CompanyDelete(id string) (err error) {
-	var (
-		companyCol = mongodb.CompanyCol()
-		ctxt       = context.Background()
-	)
+func CompanyDelete(id primitive.ObjectID) (err error) {
 
 	//Set filter
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": id}
 
 	//Delete company
-	_, err = companyCol.DeleteOne(ctxt, filter)
+	err = dao.CompanyDelete(filter)
 	return
 }

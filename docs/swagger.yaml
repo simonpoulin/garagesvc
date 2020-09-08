@@ -1,0 +1,160 @@
+basePath: /
+definitions:
+  util.Response:
+    properties:
+      data:
+        type: object
+      message:
+        type: string
+    type: object
+host: localhost:9998
+info:
+  contact: {}
+  description: This is a sample server celler server.
+  license: {}
+  title: Swagger Example API
+  version: 1.0.0
+paths:
+  /employees/:
+    get:
+      consumes:
+      - application/json
+      description: Returns list of all employees
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: List employees
+      tags:
+      - Employees
+  /employees/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an employee
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: Employee delete
+      tags:
+      - Employees
+    get:
+      consumes:
+      - application/json
+      description: Return employee's details
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: Employee detail
+      tags:
+      - Employees
+    patch:
+      consumes:
+      - application/json
+      description: Update employee's details
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: Employee update
+      tags:
+      - Employees
+  /employees/{id}/active:
+    patch:
+      consumes:
+      - application/json
+      description: Update employee's active state
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: Employee update active state
+      tags:
+      - Employees
+  /employees/active/{active}:
+    get:
+      consumes:
+      - application/json
+      description: Return list of all employees by chosen status
+      parameters:
+      - description: Active state
+        in: path
+        name: active
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: Employee list by active state
+      tags:
+      - Employees
+swagger: "2.0"

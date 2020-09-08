@@ -3,10 +3,11 @@ package util
 import (
 	"net/http"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
-type response struct {
+// Response ...
+type Response struct {
 	Message string
 	Data    interface{}
 }
@@ -17,7 +18,7 @@ func Response200(c echo.Context, message string, data interface{}) error {
 		message = "Thành công!"
 	}
 
-	return c.JSON(http.StatusOK, response{
+	return c.JSON(http.StatusOK, Response{
 		Message: message,
 		Data:    data,
 	})
@@ -29,7 +30,7 @@ func Response400(c echo.Context, message string) error {
 		message = "Không hợp lệ!"
 	}
 
-	return c.JSON(http.StatusOK, response{
+	return c.JSON(http.StatusBadRequest, Response{
 		Message: message,
 	})
 }
@@ -40,7 +41,18 @@ func Response401(c echo.Context, message string) error {
 		message = "Bạn không có quyền truy cập!"
 	}
 
-	return c.JSON(http.StatusUnauthorized, response{
+	return c.JSON(http.StatusUnauthorized, Response{
+		Message: message,
+	})
+}
+
+// Response404 ...
+func Response404(c echo.Context, message string) error {
+	if message == "" {
+		message = "Không tìm thấy kết quả!"
+	}
+
+	return c.JSON(http.StatusNotFound, Response{
 		Message: message,
 	})
 }

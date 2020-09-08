@@ -19,15 +19,15 @@ type Booking struct {
 
 // BookingCreatePayload ...
 type BookingCreatePayload struct {
-	CustomerID string    `json:"customer_id" bson:"customer_id" valid:"required, stringlength(24|24)"`
-	ServiceID  string    `json:"service_id" bson:"service_id" valid:"required, stringlength(24|24)"`
-	Date       time.Time `json:"time" bson:"time"`
-	Note       string    `json:"note" bson:"note" valid:"stringlength(0|500)"`
+	CustomerID primitive.ObjectID `json:"customer_id" bson:"customer_id" valid:"required, stringlength(24|24)"`
+	ServiceID  primitive.ObjectID `json:"service_id" bson:"service_id" valid:"required, stringlength(24|24)"`
+	Date       time.Time          `json:"time" bson:"time"`
+	Note       string             `json:"note" bson:"note" valid:"stringlength(0|500)"`
 }
 
 // BookingUpdatePayload ...
 type BookingUpdatePayload struct {
-	ServiceID string    `json:"service_id" bson:"service_id" valid:"required, stringlength(24|24)"`
-	Date      time.Time `json:"time" bson:"time"`
-	Note      string    `json:"note" bson:"note" valid:"stringlength(0|500)"`
+	ServiceID primitive.ObjectID `json:"service_id" bson:"service_id" valid:"required, stringlength(24|24)"`
+	Date      time.Time          `json:"time" bson:"time"`
+	Note      string             `json:"note" bson:"note" valid:"stringlength(0|500)"`
 }

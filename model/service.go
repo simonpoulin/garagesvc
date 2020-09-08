@@ -14,10 +14,10 @@ type Service struct {
 
 // ServiceCreatePayload ...
 type ServiceCreatePayload struct {
-	CompanyID string   `json:"company_id" bson:"company_id" valid:"required, stringlength(24|24)"`
-	Name      string   `json:"name" bson:"name" valid:"required, stringlength(1|20)"`
-	Location  Location `json:"location" bson:"location"`
-	Address   string   `json:"address" bson:"address" validator:"required, stringlength(1|50)"`
+	CompanyID primitive.ObjectID `json:"company_id" bson:"company_id" valid:"required, stringlength(24|24)"`
+	Name      string             `json:"name" bson:"name" valid:"required, stringlength(1|20)"`
+	Location  Location           `json:"location" bson:"location"`
+	Address   string             `json:"address" bson:"address" validator:"required, stringlength(1|50)"`
 }
 
 // ServiceUpdatePayload ...

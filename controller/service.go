@@ -5,7 +5,7 @@ import (
 	"garagesvc/service"
 	"garagesvc/util"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 // ServiceCreate ...
@@ -17,9 +17,9 @@ func ServiceCreate(c echo.Context) error {
 	//Create service
 	result, err := service.ServiceCreate(payload)
 
-	//If error, return 400
+	//If error, return 404
 	if err != nil {
-		return util.Response400(c, err.Error())
+		return util.Response404(c, err.Error())
 	}
 
 	//Return 200
@@ -29,15 +29,15 @@ func ServiceCreate(c echo.Context) error {
 // ServiceDetail ...
 func ServiceDetail(c echo.Context) error {
 	var (
-		id = c.Param("id")
+		svc = c.Get("service").(model.Service)
 	)
 
 	//Get service by ID
-	result, err := service.ServiceDetail(id)
+	result, err := service.ServiceDetail(svc.ID)
 
-	//If error, return 400
+	//If error, return 404
 	if err != nil {
-		return util.Response400(c, err.Error())
+		return util.Response404(c, err.Error())
 	}
 
 	//Return 200
@@ -50,9 +50,9 @@ func ServiceList(c echo.Context) error {
 	//Get service list
 	result, err := service.ServiceList()
 
-	//If error, return 400
+	//If error, return 404
 	if err != nil {
-		return util.Response400(c, err.Error())
+		return util.Response404(c, err.Error())
 	}
 
 	//Return 200
@@ -62,15 +62,15 @@ func ServiceList(c echo.Context) error {
 // ServiceListByCompanyID ...
 func ServiceListByCompanyID(c echo.Context) error {
 	var (
-		companyID = c.Param("companyID")
+		company = c.Get("company").(model.Company)
 	)
 
 	//Get service list
-	result, err := service.ServiceListByCompanyID(companyID)
+	result, err := service.ServiceListByCompanyID(company.ID)
 
-	//If error, return 400
+	//If error, return 404
 	if err != nil {
-		return util.Response400(c, err.Error())
+		return util.Response404(c, err.Error())
 	}
 
 	//Return 200
@@ -86,9 +86,9 @@ func ServiceListByActiveState(c echo.Context) error {
 	//Get service list
 	result, err := service.ServiceListByActiveState(active)
 
-	//If error, return 400
+	//If error, return 404
 	if err != nil {
-		return util.Response400(c, err.Error())
+		return util.Response404(c, err.Error())
 	}
 
 	//Return 200
@@ -98,16 +98,16 @@ func ServiceListByActiveState(c echo.Context) error {
 // ServiceUpdate ...
 func ServiceUpdate(c echo.Context) error {
 	var (
-		id      = c.Param("id")
+		svc     = c.Get("service").(model.Service)
 		payload = c.Get("body").(model.ServiceUpdatePayload)
 	)
 
 	//Update service
-	result, err := service.ServiceUpdate(id, payload)
+	result, err := service.ServiceUpdate(svc.ID, payload)
 
-	//If error, return 400
+	//If error, return 404
 	if err != nil {
-		return util.Response400(c, err.Error())
+		return util.Response404(c, err.Error())
 	}
 
 	//Return 200
@@ -117,15 +117,15 @@ func ServiceUpdate(c echo.Context) error {
 // ServiceChangeActive ...
 func ServiceChangeActive(c echo.Context) error {
 	var (
-		id = c.Param("id")
+		svc = c.Get("service").(model.Service)
 	)
 
 	//Change service active state
-	result, err := service.ServiceChangeActive(id)
+	result, err := service.ServiceChangeActive(svc.ID)
 
-	//If error, return 400
+	//If error, return 404
 	if err != nil {
-		return util.Response400(c, err.Error())
+		return util.Response404(c, err.Error())
 	}
 
 	//Return 200
@@ -135,15 +135,15 @@ func ServiceChangeActive(c echo.Context) error {
 // ServiceDelete ...
 func ServiceDelete(c echo.Context) error {
 	var (
-		id = c.Param("id")
+		svc = c.Get("service").(model.Service)
 	)
 
 	//Delete service by ID
-	err := service.ServiceDelete(id)
+	err := service.ServiceDelete(svc.ID)
 
-	//If error, return 400
+	//If error, return 404
 	if err != nil {
-		return util.Response400(c, err.Error())
+		return util.Response404(c, err.Error())
 	}
 
 	//Return 200

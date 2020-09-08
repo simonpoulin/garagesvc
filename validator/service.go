@@ -1,13 +1,14 @@
 package validator
 
 import (
-	"errors"
+	"garagesvc/dao"
 	"garagesvc/model"
-	"garagesvc/service"
 	"garagesvc/util"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // ServiceCreate ...
@@ -58,25 +59,31 @@ func ServiceUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// ServiceCheck ...
-func ServiceCheck(next echo.HandlerFunc) echo.HandlerFunc {
+// ServiceCheckExistance ...
+func ServiceCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			serviceID = c.Param("serviceID")
+			id      primitive.ObjectID
+			service model.Service
 		)
 
-		//Validate service ID
-		svc, err := service.ServiceDetail(serviceID)
+		//Bind ID
+		id, err := primitive.ObjectIDFromHex(c.Param("id"))
 		if err != nil {
 			return util.Response400(c, err.Error())
 		}
 
-		//Check service status
-		if !svc.Active {
-			err = errors.New("service not active")
-			return util.Response400(c, err.Error())
+		//Set filter
+		filter := bson.M{"_id": id}
+
+		//Validate service
+		service, err = dao.ServiceFindOne(filter)
+		if err != nil {
+			return util.Response404(c, err.Error())
 		}
 
+		//Set body and move to next process
+		c.Set("service", service)
 		return next(c)
 	}
 }

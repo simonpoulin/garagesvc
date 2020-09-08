@@ -1,9 +1,9 @@
 package service
 
 import (
-	"context"
+	"garagesvc/dao"
 	"garagesvc/model"
-	"garagesvc/module/mongodb"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -11,255 +11,101 @@ import (
 
 // BookingCreate ...
 func BookingCreate(payload model.BookingCreatePayload) (bookingID string, err error) {
-	var (
-		booking    model.Booking
-		bookingCol = mongodb.BookingCol()
-		ctxt       = context.Background()
-	)
+	var booking model.Booking
 
 	//Set data for new booking
-	booking.CustomerID, err = primitive.ObjectIDFromHex(payload.CustomerID)
-	if err != nil {
-		return
-	}
-	booking.ServiceID, err = primitive.ObjectIDFromHex(payload.ServiceID)
-	if err != nil {
-		return
-	}
+	booking.CustomerID = payload.CustomerID
+	booking.ServiceID = payload.ServiceID
 	booking.ID = primitive.NewObjectID()
 	booking.Status = "Pending"
 	booking.Date = payload.Date
 	booking.Note = payload.Note
+	booking.CreatedAt = time.Now()
 
 	//Insert to database
-	_, err = bookingCol.InsertOne(ctxt, booking)
+	err = dao.BookingCreate(booking)
 	bookingID = booking.ID.Hex()
 	return
 }
 
 // BookingDetail ...
-func BookingDetail(id string) (e model.Booking, err error) {
-	var (
-		bookingCol = mongodb.BookingCol()
-		ctxt       = context.Background()
-	)
+func BookingDetail(id primitive.ObjectID) (booking model.Booking, err error) {
 
 	//Set filter
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": id}
 
 	//Looking for booking from database
-	err = bookingCol.FindOne(ctxt, filter).Decode(&e)
+	booking, err = dao.BookingFindOne(filter)
 	return
 }
 
 // BookingList ...
 func BookingList() (bookingList []model.Booking, err error) {
-	var (
-		bookingCol = mongodb.BookingCol()
-		ctxt       = context.Background()
-	)
 
 	//Get bookings
-	cur, err := bookingCol.Find(ctxt, bson.M{})
-	if err != nil {
-		return
-	}
-	defer cur.Close(ctxt)
-
-	//Add bookings to list
-	for cur.Next(ctxt) {
-		var result model.Booking
-		err = cur.Decode(&result)
-		if err != nil {
-			return nil, err
-		}
-		bookingList = append(bookingList, result)
-	}
-	if err = cur.Err(); err != nil {
-		return nil, err
-	}
+	bookingList, err = dao.BookingFind(bson.M{})
 	return
 }
 
 // BookingListByStatus ...
 func BookingListByStatus(status string) (bookingList []model.Booking, err error) {
-	var (
-		bookingCol = mongodb.BookingCol()
-		ctxt       = context.Background()
-	)
 
 	//Set filter
 	filter := bson.M{"status": status}
 
 	//Get bookings
-	cur, err := bookingCol.Find(ctxt, filter)
-	if err != nil {
-		return
-	}
-	defer cur.Close(ctxt)
-
-	//Add bookings to list
-	for cur.Next(ctxt) {
-		var result model.Booking
-		err = cur.Decode(&result)
-		if err != nil {
-			return nil, err
-		}
-		bookingList = append(bookingList, result)
-	}
-	if err = cur.Err(); err != nil {
-		return nil, err
-	}
+	bookingList, err = dao.BookingFind(filter)
 	return
 }
 
 // BookingListByServiceID ...
-func BookingListByServiceID(serviceID string) (bookingList []model.Booking, err error) {
-	var (
-		bookingCol = mongodb.BookingCol()
-		ctxt       = context.Background()
-	)
+func BookingListByServiceID(serviceID primitive.ObjectID) (bookingList []model.Booking, err error) {
 
 	//Set filter
-	svcID, err := primitive.ObjectIDFromHex(serviceID)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"service_id": svcID}
+	filter := bson.M{"service_id": serviceID}
 
 	//Get bookings
-	cur, err := bookingCol.Find(ctxt, filter)
-	if err != nil {
-		return
-	}
-	defer cur.Close(ctxt)
-
-	//Add bookings to list
-	for cur.Next(ctxt) {
-		var result model.Booking
-		err = cur.Decode(&result)
-		if err != nil {
-			return nil, err
-		}
-		bookingList = append(bookingList, result)
-	}
-	if err = cur.Err(); err != nil {
-		return nil, err
-	}
+	bookingList, err = dao.BookingFind(filter)
 	return
 }
 
 // BookingListByCustomerID ...
-func BookingListByCustomerID(customerID string) (bookingList []model.Booking, err error) {
-	var (
-		bookingCol = mongodb.BookingCol()
-		ctxt       = context.Background()
-	)
+func BookingListByCustomerID(customerID primitive.ObjectID) (bookingList []model.Booking, err error) {
 
 	//Set filter
-	ctmID, err := primitive.ObjectIDFromHex(customerID)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"customer_id": ctmID}
+	filter := bson.M{"customer_id": customerID}
 
 	//Get bookings
-	cur, err := bookingCol.Find(ctxt, filter)
-	if err != nil {
-		return
-	}
-	defer cur.Close(ctxt)
-
-	//Add bookings to list
-	for cur.Next(ctxt) {
-		var result model.Booking
-		err = cur.Decode(&result)
-		if err != nil {
-			return nil, err
-		}
-		bookingList = append(bookingList, result)
-	}
-	if err = cur.Err(); err != nil {
-		return nil, err
-	}
+	bookingList, err = dao.BookingFind(filter)
 	return
 }
 
 // BookingUpdate ...
-func BookingUpdate(id string, payload model.BookingUpdatePayload) (bookingID string, err error) {
-	var (
-		bookingCol = mongodb.BookingCol()
-		ctxt       = context.Background()
-	)
+func BookingUpdate(id primitive.ObjectID, payload model.BookingUpdatePayload) (bookingID primitive.ObjectID, err error) {
 
 	//Set filter and data
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
-	update := bson.M{"$set": bson.M{
+	filter := bson.M{"_id": id}
+	data := bson.M{"$set": bson.M{
 		"service_id": payload.ServiceID,
 		"date":       payload.Date,
 		"note":       payload.Note,
 	}}
 
 	//Update booking
-	_, err = bookingCol.UpdateOne(ctxt, filter, update)
-	if err != nil {
-		return
-	}
+	err = dao.BookingUpdateOne(filter, data)
 
 	//Return data
 	bookingID = id
 	return
 }
 
-// BookingChangeStatus ...
-func BookingChangeStatus(id string, status string) (bookingStatus string, err error) {
-	var (
-		bookingCol = mongodb.BookingCol()
-		ctxt       = context.Background()
-	)
-
-	//Set filter and active state data
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
-	update := bson.M{"$set": bson.M{"status": status}}
-
-	//Update booking
-	_, err = bookingCol.UpdateOne(ctxt, filter, update)
-	if err != nil {
-		return
-	}
-
-	//Return data
-	bookingStatus = status
-	return
-}
-
 // BookingDelete ...
-func BookingDelete(id string) (err error) {
-	var (
-		bookingCol = mongodb.BookingCol()
-		ctxt       = context.Background()
-	)
+func BookingDelete(id primitive.ObjectID) (err error) {
 
 	//Set filter
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": id}
 
 	//Delete booking
-	_, err = bookingCol.DeleteOne(ctxt, filter)
+	err = dao.BookingDelete(filter)
 	return
 }

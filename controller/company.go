@@ -5,7 +5,7 @@ import (
 	"garagesvc/service"
 	"garagesvc/util"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 // CompanyCreate ...
@@ -17,9 +17,9 @@ func CompanyCreate(c echo.Context) error {
 	//Create company
 	result, err := service.CompanyCreate(payload)
 
-	//If error, return 400
+	//If error, return 404
 	if err != nil {
-		return util.Response400(c, err.Error())
+		return util.Response404(c, err.Error())
 	}
 
 	//Return 200
@@ -29,15 +29,15 @@ func CompanyCreate(c echo.Context) error {
 // CompanyDetail ...
 func CompanyDetail(c echo.Context) error {
 	var (
-		id = c.Param("id")
+		company = c.Get("company").(model.Company)
 	)
 
 	//Get company by ID
-	result, err := service.CompanyDetail(id)
+	result, err := service.CompanyDetail(company.ID)
 
-	//If error, return 400
+	//If error, return 404
 	if err != nil {
-		return util.Response400(c, err.Error())
+		return util.Response404(c, err.Error())
 	}
 
 	//Return 200
@@ -50,9 +50,9 @@ func CompanyList(c echo.Context) error {
 	//Get company list
 	result, err := service.CompanyList()
 
-	//If error, return 400
+	//If error, return 404
 	if err != nil {
-		return util.Response400(c, err.Error())
+		return util.Response404(c, err.Error())
 	}
 
 	//Return 200
@@ -62,16 +62,16 @@ func CompanyList(c echo.Context) error {
 // CompanyUpdate ...
 func CompanyUpdate(c echo.Context) error {
 	var (
-		id      = c.Param("id")
+		company = c.Get("company").(model.Company)
 		payload = c.Get("body").(model.CompanyUpdatePayload)
 	)
 
 	//Update company
-	result, err := service.CompanyUpdate(id, payload)
+	result, err := service.CompanyUpdate(company.ID, payload)
 
-	//If error, return 400
+	//If error, return 404
 	if err != nil {
-		return util.Response400(c, err.Error())
+		return util.Response404(c, err.Error())
 	}
 
 	//Return 200
@@ -81,15 +81,15 @@ func CompanyUpdate(c echo.Context) error {
 // CompanyChangeActive ...
 func CompanyChangeActive(c echo.Context) error {
 	var (
-		id = c.Param("id")
+		company = c.Get("company").(model.Company)
 	)
 
 	//Change company active state
-	result, err := service.CompanyChangeActive(id)
+	result, err := service.CompanyChangeActive(company.ID)
 
-	//If error, return 400
+	//If error, return 404
 	if err != nil {
-		return util.Response400(c, err.Error())
+		return util.Response404(c, err.Error())
 	}
 
 	//Return 200
@@ -99,15 +99,15 @@ func CompanyChangeActive(c echo.Context) error {
 // CompanyDelete ...
 func CompanyDelete(c echo.Context) error {
 	var (
-		id = c.Param("id")
+		company = c.Get("company").(model.Company)
 	)
 
 	//Delete company by ID
-	err := service.CompanyDelete(id)
+	err := service.CompanyDelete(company.ID)
 
-	//If error, return 400
+	//If error, return 404
 	if err != nil {
-		return util.Response400(c, err.Error())
+		return util.Response404(c, err.Error())
 	}
 
 	//Return 200

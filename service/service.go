@@ -1,27 +1,19 @@
 package service
 
 import (
-	"context"
+	"garagesvc/dao"
 	"garagesvc/model"
-	"garagesvc/module/mongodb"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // ServiceCreate ...
-func ServiceCreate(payload model.ServiceCreatePayload) (serviceID string, err error) {
-	var (
-		service    model.Service
-		serviceCol = mongodb.ServiceCol()
-		ctxt       = context.Background()
-	)
+func ServiceCreate(payload model.ServiceCreatePayload) (serviceID primitive.ObjectID, err error) {
+	var service model.Service
 
 	//Set data for new service
-	service.CompanyID, err = primitive.ObjectIDFromHex(payload.CompanyID)
-	if err != nil {
-		return
-	}
+	service.CompanyID = payload.CompanyID
 	service.ID = primitive.NewObjectID()
 	service.Location = payload.Location
 	service.Active = false
@@ -29,139 +21,57 @@ func ServiceCreate(payload model.ServiceCreatePayload) (serviceID string, err er
 	service.Name = payload.Name
 
 	//Insert to database
-	_, err = serviceCol.InsertOne(ctxt, service)
-	serviceID = service.ID.Hex()
+	err = dao.ServiceCreate(service)
+	serviceID = service.ID
 	return
 }
 
 // ServiceDetail ...
-func ServiceDetail(id string) (e model.Service, err error) {
-	var (
-		serviceCol = mongodb.ServiceCol()
-		ctxt       = context.Background()
-	)
+func ServiceDetail(id primitive.ObjectID) (service model.Service, err error) {
 
 	//Set filter
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": id}
 
 	//Looking for service from database
-	err = serviceCol.FindOne(ctxt, filter).Decode(&e)
+	service, err = dao.ServiceFindOne(filter)
 	return
 }
 
 // ServiceList ...
 func ServiceList() (serviceList []model.Service, err error) {
-	var (
-		serviceCol = mongodb.ServiceCol()
-		ctxt       = context.Background()
-	)
 
 	//Get services by company ID
-	cur, err := serviceCol.Find(ctxt, bson.M{})
-	if err != nil {
-		return
-	}
-	defer cur.Close(ctxt)
-
-	//Add services to list
-	for cur.Next(ctxt) {
-		var result model.Service
-		err = cur.Decode(&result)
-		if err != nil {
-			return nil, err
-		}
-		serviceList = append(serviceList, result)
-	}
-	if err = cur.Err(); err != nil {
-		return nil, err
-	}
+	serviceList, err = dao.ServiceFind(bson.M{})
 	return
 }
 
 // ServiceListByCompanyID ...
-func ServiceListByCompanyID(companyID string) (serviceList []model.Service, err error) {
-	var (
-		serviceCol = mongodb.ServiceCol()
-		ctxt       = context.Background()
-	)
+func ServiceListByCompanyID(companyID primitive.ObjectID) (serviceList []model.Service, err error) {
+
+	//Set filter
+	filter := bson.M{"company_id": companyID}
 
 	//Get services by company ID
-	cpnID, err := primitive.ObjectIDFromHex(companyID)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"company_id": cpnID}
-	cur, err := serviceCol.Find(ctxt, filter)
-	if err != nil {
-		return
-	}
-	defer cur.Close(ctxt)
-
-	//Add services to list
-	for cur.Next(ctxt) {
-		var result model.Service
-		err = cur.Decode(&result)
-		if err != nil {
-			return nil, err
-		}
-		serviceList = append(serviceList, result)
-	}
-	if err = cur.Err(); err != nil {
-		return nil, err
-	}
+	serviceList, err = dao.ServiceFind(filter)
 	return
 }
 
 // ServiceListByActiveState ...
 func ServiceListByActiveState(active string) (serviceList []model.Service, err error) {
-	var (
-		serviceCol = mongodb.ServiceCol()
-		ctxt       = context.Background()
-	)
 
 	//Set filter
 	filter := bson.M{"active": active}
 
 	//Get services
-
-	cur, err := serviceCol.Find(ctxt, filter)
-	if err != nil {
-		return
-	}
-	defer cur.Close(ctxt)
-
-	//Add services to list
-	for cur.Next(ctxt) {
-		var result model.Service
-		err = cur.Decode(&result)
-		if err != nil {
-			return nil, err
-		}
-		serviceList = append(serviceList, result)
-	}
-	if err = cur.Err(); err != nil {
-		return nil, err
-	}
+	serviceList, err = dao.ServiceFind(filter)
 	return
 }
 
 // ServiceUpdate ...
-func ServiceUpdate(id string, payload model.ServiceUpdatePayload) (serviceID string, err error) {
-	var (
-		serviceCol = mongodb.ServiceCol()
-		ctxt       = context.Background()
-	)
+func ServiceUpdate(id primitive.ObjectID, payload model.ServiceUpdatePayload) (serviceID primitive.ObjectID, err error) {
 
 	//Set filter and data
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": id}
 	update := bson.M{"$set": bson.M{
 		"active":   payload.Active,
 		"address":  payload.Address,
@@ -170,10 +80,7 @@ func ServiceUpdate(id string, payload model.ServiceUpdatePayload) (serviceID str
 	}}
 
 	//Update service
-	_, err = serviceCol.UpdateOne(ctxt, filter, update)
-	if err != nil {
-		return
-	}
+	err = dao.ServiceUpdateOne(filter, update)
 
 	//Return data
 	serviceID = id
@@ -181,47 +88,35 @@ func ServiceUpdate(id string, payload model.ServiceUpdatePayload) (serviceID str
 }
 
 // ServiceChangeActive ...
-func ServiceChangeActive(id string) (serviceStatus bool, err error) {
-	var (
-		service    model.Service
-		serviceCol = mongodb.ServiceCol()
-		ctxt       = context.Background()
-	)
+func ServiceChangeActive(id primitive.ObjectID) (serviceID primitive.ObjectID, err error) {
 
-	//Set filter and data
-	_id, err := primitive.ObjectIDFromHex(id)
+	//Set filter
+	filter := bson.M{"_id": id}
+
+	//Get service
+	service, err := dao.ServiceFindOne(filter)
 	if err != nil {
 		return
 	}
-	filter := bson.M{"_id": _id}
+
+	//Set active state data
 	update := bson.M{"$set": bson.M{"active": !service.Active}}
 
 	//Update service
-	_, err = serviceCol.UpdateOne(ctxt, filter, update)
-	if err != nil {
-		return
-	}
+	err = dao.ServiceUpdateOne(filter, update)
 
 	//Return data
-	serviceStatus = !service.Active
+	serviceID = service.ID
 	return
 }
 
 // ServiceDelete ...
-func ServiceDelete(id string) (err error) {
-	var (
-		serviceCol = mongodb.ServiceCol()
-		ctxt       = context.Background()
-	)
+func ServiceDelete(id primitive.ObjectID) (err error) {
 
 	//Set filter
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": id}
 
 	//Delete service
-	_, err = serviceCol.DeleteOne(ctxt, filter)
+	err = dao.ServiceDelete(filter)
 	return
 }

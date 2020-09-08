@@ -1,10 +1,9 @@
 package service
 
 import (
-	"context"
 	"errors"
+	"garagesvc/dao"
 	"garagesvc/model"
-	"garagesvc/module/mongodb"
 	"garagesvc/util"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,12 +11,8 @@ import (
 )
 
 // CustomerCreate ...
-func CustomerCreate(payload model.CustomerPayload) (customerID string, err error) {
-	var (
-		customer    model.Customer
-		customerCol = mongodb.CustomerCol()
-		ctxt        = context.Background()
-	)
+func CustomerCreate(payload model.CustomerPayload) (customerID primitive.ObjectID, err error) {
+	var customer model.Customer
 
 	//Set data for new customer
 	customer.ID = primitive.NewObjectID()
@@ -26,97 +21,55 @@ func CustomerCreate(payload model.CustomerPayload) (customerID string, err error
 	customer.Phone = payload.Phone
 
 	//Insert to database
-	_, err = customerCol.InsertOne(ctxt, customer)
-	customerID = customer.ID.Hex()
+	err = dao.CustomerCreate(customer)
+	customerID = customer.ID
 	return
 }
 
 // CustomerLogin ...
 func CustomerLogin(payload model.CustomerLoginPayload) (token string, err error) {
-	var (
-		customerCol = mongodb.CustomerCol()
-		ctxt        = context.Background()
-	)
 
 	//Get customer by phone number
 	payload.Password = util.Hash(payload.Password)
-	var e model.Customer
 	filter := bson.M{"phone": payload.Phone}
-	err = customerCol.FindOne(ctxt, filter).Decode(&e)
+	customer, err := dao.CustomerFindOne(filter)
 	if err != nil {
 		return
 	}
 
 	//Check password match
-	if payload.Password != e.Password {
+	if payload.Password != customer.Password {
 		err = errors.New("password not match")
 		return
 	}
-	token, err = util.TokenEncode(e.ID.Hex())
+	token, err = customer.GenerateToken()
 	return
 }
 
 // CustomerDetail ...
-func CustomerDetail(id string) (e model.Customer, err error) {
-	var (
-		customerCol = mongodb.CustomerCol()
-		ctxt        = context.Background()
-	)
+func CustomerDetail(id primitive.ObjectID) (customer model.Customer, err error) {
 
 	//Set filter
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": id}
 
 	//Looking for customer from database
-	err = customerCol.FindOne(ctxt, filter).Decode(&e)
+	customer, err = dao.CustomerFindOne(filter)
 	return
 }
 
 // CustomerList ...
 func CustomerList() (customerList []model.Customer, err error) {
-	var (
-		customerCol = mongodb.CustomerCol()
-		ctxt        = context.Background()
-	)
 
 	//Get customers
-	cur, err := customerCol.Find(ctxt, bson.M{})
-	if err != nil {
-		return
-	}
-	defer cur.Close(ctxt)
-
-	//Add customers to list
-	for cur.Next(ctxt) {
-		var result model.Customer
-		err = cur.Decode(&result)
-		if err != nil {
-			return nil, err
-		}
-		customerList = append(customerList, result)
-	}
-	if err = cur.Err(); err != nil {
-		return nil, err
-	}
+	customerList, err = dao.CustomerFind(bson.M{})
 	return
 }
 
 // CustomerUpdate ...
-func CustomerUpdate(id string, payload model.CustomerPayload) (customerID string, err error) {
-	var (
-		customerCol = mongodb.CustomerCol()
-		ctxt        = context.Background()
-	)
+func CustomerUpdate(id primitive.ObjectID, payload model.CustomerPayload) (customerID primitive.ObjectID, err error) {
 
 	//Set filter and data
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": id}
 	update := bson.M{"$set": bson.M{
 		"password": payload.Password,
 		"name":     payload.Name,
@@ -124,10 +77,7 @@ func CustomerUpdate(id string, payload model.CustomerPayload) (customerID string
 	}}
 
 	//Update customer
-	_, err = customerCol.UpdateOne(ctxt, filter, update)
-	if err != nil {
-		return
-	}
+	err = dao.CustomerUpdateOne(filter, update)
 
 	//Return data
 	customerID = id
@@ -135,20 +85,12 @@ func CustomerUpdate(id string, payload model.CustomerPayload) (customerID string
 }
 
 // CustomerDelete ...
-func CustomerDelete(id string) (err error) {
-	var (
-		customerCol = mongodb.CustomerCol()
-		ctxt        = context.Background()
-	)
+func CustomerDelete(id primitive.ObjectID) (err error) {
 
 	//Set filter
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": id}
 
 	//Delete customer
-	_, err = customerCol.DeleteOne(ctxt, filter)
+	err = dao.CustomerDelete(filter)
 	return
 }

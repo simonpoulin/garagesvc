@@ -1,11 +1,9 @@
 package util
 
 import (
-	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/joho/godotenv"
 )
 
 // UserClaim ...
@@ -15,13 +13,7 @@ type UserClaim struct {
 }
 
 // TokenEncode ...
-func TokenEncode(ID string) (tokenString string, err error) {
-
-	// Load dotenv for signing key
-	err = godotenv.Load()
-	if err != nil {
-		return "", err
-	}
+func TokenEncode(ID string, key string) (tokenString string, err error) {
 
 	//Generate token
 	claims := &UserClaim{
@@ -31,6 +23,6 @@ func TokenEncode(ID string) (tokenString string, err error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err = token.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
+	tokenString, err = token.SignedString([]byte(key))
 	return
 }

@@ -1,13 +1,14 @@
 package validator
 
 import (
-	"errors"
+	"garagesvc/dao"
 	"garagesvc/model"
-	"garagesvc/service"
 	"garagesvc/util"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // CompanyCreate ...
@@ -58,25 +59,31 @@ func CompanyUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// CompanyCheck ...
-func CompanyCheck(next echo.HandlerFunc) echo.HandlerFunc {
+// CompanyCheckExistance ...
+func CompanyCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			companyID = c.Param("companyID")
+			id      primitive.ObjectID
+			company model.Company
 		)
 
-		//Validate company ID
-		company, err := service.CompanyDetail(companyID)
+		//Bind ID
+		id, err := primitive.ObjectIDFromHex(c.Param("id"))
 		if err != nil {
 			return util.Response400(c, err.Error())
 		}
 
-		//Check company status
-		if !company.Active {
-			err = errors.New("company not active")
-			return util.Response400(c, err.Error())
+		//Set filter
+		filter := bson.M{"_id": id}
+
+		//Validate company
+		company, err = dao.CompanyFindOne(filter)
+		if err != nil {
+			return util.Response404(c, err.Error())
 		}
 
+		//Set body and move to next process
+		c.Set("company", company)
 		return next(c)
 	}
 }

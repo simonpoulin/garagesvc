@@ -1,12 +1,10 @@
 package route
 
-import "github.com/labstack/echo"
+import "github.com/labstack/echo/v4"
 
 // Bootstrap ...
 func Bootstrap(e *echo.Echo) {
-	booking(e)
-	company(e)
-	employee(e)
-	customer(e)
-	service(e)
+	admin(e)
+	user(e)
+	common(e)
 }

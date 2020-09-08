@@ -1,6 +1,11 @@
 package model
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"garagesvc/config"
+	"garagesvc/util"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 // Employee ...
 type Employee struct {
@@ -30,4 +35,11 @@ type EmployeeUpdatePayload struct {
 	Phone    string `json:"phone" bson:"phone" valid:"required, type(string), stringlength(10|10)"`
 	Password string `json:"password" bson:"password" valid:"required, type(string), stringlength(6|20)"`
 	Active   bool   `json:"active" bson:"active" valid:"required, type(bool)"`
+}
+
+// GenerateToken ...
+func (e Employee) GenerateToken() (token string, err error) {
+	env := config.GetENV()
+	token, err = util.TokenEncode(e.ID.Hex(), env.EmployeeKey)
+	return
 }

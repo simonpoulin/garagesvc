@@ -1,10 +1,9 @@
 package service
 
 import (
-	"context"
 	"errors"
+	"garagesvc/dao"
 	"garagesvc/model"
-	"garagesvc/module/mongodb"
 	"garagesvc/util"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,12 +11,8 @@ import (
 )
 
 // EmployeeCreate ...
-func EmployeeCreate(payload model.EmployeeCreatePayload) (employeeID string, err error) {
-	var (
-		employee    model.Employee
-		employeeCol = mongodb.EmployeeCol()
-		ctxt        = context.Background()
-	)
+func EmployeeCreate(payload model.EmployeeCreatePayload) (employeeID primitive.ObjectID, err error) {
+	var employee model.Employee
 
 	//Set data for new employee
 	employee.ID = primitive.NewObjectID()
@@ -27,130 +22,62 @@ func EmployeeCreate(payload model.EmployeeCreatePayload) (employeeID string, err
 	employee.Phone = payload.Phone
 
 	//Insert to database
-	_, err = employeeCol.InsertOne(ctxt, employee)
-	employeeID = employee.ID.Hex()
+	err = dao.EmployeeCreate(employee)
+	employeeID = employee.ID
 	return
 }
 
 // EmployeeLogin ...
 func EmployeeLogin(payload model.EmployeeLoginPayload) (token string, err error) {
-	var (
-		employeeCol = mongodb.EmployeeCol()
-		ctxt        = context.Background()
-	)
 
 	//Get employee by phone number
 	payload.Password = util.Hash(payload.Password)
-	var e model.Employee
 	filter := bson.M{"phone": payload.Phone}
-	err = employeeCol.FindOne(ctxt, filter).Decode(&e)
-	if err != nil {
-		return
-	}
+	employee, err := dao.EmployeeFindOne(filter)
 
 	//Check password match
-	if payload.Password != e.Password {
+	if payload.Password != employee.Password {
 		err = errors.New("password not match")
 		return
 	}
-	token, err = util.TokenEncode(e.ID.Hex())
+	token, err = employee.GenerateToken()
 	return
 }
 
 // EmployeeDetail ...
-func EmployeeDetail(id string) (e model.Employee, err error) {
-	var (
-		employeeCol = mongodb.EmployeeCol()
-		ctxt        = context.Background()
-	)
+func EmployeeDetail(id primitive.ObjectID) (employee model.Employee, err error) {
 
-	//Set filter
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": id}
 
 	//Looking for employee from database
-	err = employeeCol.FindOne(ctxt, filter).Decode(&e)
+	employee, err = dao.EmployeeFindOne(filter)
 	return
 }
 
 // EmployeeList ...
 func EmployeeList() (employeeList []model.Employee, err error) {
-	var (
-		employeeCol = mongodb.EmployeeCol()
-		ctxt        = context.Background()
-	)
 
 	//Get employees
-	cur, err := employeeCol.Find(ctxt, bson.M{})
-	if err != nil {
-		return
-	}
-	defer cur.Close(ctxt)
-
-	//Add employees to list
-	for cur.Next(ctxt) {
-		var result model.Employee
-		err = cur.Decode(&result)
-		if err != nil {
-			return nil, err
-		}
-		employeeList = append(employeeList, result)
-	}
-	if err = cur.Err(); err != nil {
-		return nil, err
-	}
+	employeeList, err = dao.EmployeeFind(bson.M{})
 	return
 }
 
 // EmployeeListByActiveState ...
 func EmployeeListByActiveState(active string) (employeeList []model.Employee, err error) {
-	var (
-		employeeCol = mongodb.EmployeeCol()
-		ctxt        = context.Background()
-	)
 
 	//Set filter
 	filter := bson.M{"active": active}
 
 	//Get employees
-
-	cur, err := employeeCol.Find(ctxt, filter)
-	if err != nil {
-		return
-	}
-	defer cur.Close(ctxt)
-
-	//Add employees to list
-	for cur.Next(ctxt) {
-		var result model.Employee
-		err = cur.Decode(&result)
-		if err != nil {
-			return nil, err
-		}
-		employeeList = append(employeeList, result)
-	}
-	if err = cur.Err(); err != nil {
-		return nil, err
-	}
+	employeeList, err = dao.EmployeeFind(filter)
 	return
 }
 
 // EmployeeUpdate ...
-func EmployeeUpdate(id string, payload model.EmployeeUpdatePayload) (employeeID string, err error) {
-	var (
-		employeeCol = mongodb.EmployeeCol()
-		ctxt        = context.Background()
-	)
+func EmployeeUpdate(id primitive.ObjectID, payload model.EmployeeUpdatePayload) (employeeID primitive.ObjectID, err error) {
 
 	//Set filter and data
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": id}
 	update := bson.M{"$set": bson.M{
 		"active":   payload.Active,
 		"password": payload.Password,
@@ -159,10 +86,7 @@ func EmployeeUpdate(id string, payload model.EmployeeUpdatePayload) (employeeID 
 	}}
 
 	//Update employee
-	_, err = employeeCol.UpdateOne(ctxt, filter, update)
-	if err != nil {
-		return
-	}
+	err = dao.EmployeeUpdateOne(filter, update)
 
 	//Return data
 	employeeID = id
@@ -170,47 +94,35 @@ func EmployeeUpdate(id string, payload model.EmployeeUpdatePayload) (employeeID 
 }
 
 // EmployeeChangeActive ...
-func EmployeeChangeActive(id string) (employeeStatus bool, err error) {
-	var (
-		employee    model.Employee
-		employeeCol = mongodb.EmployeeCol()
-		ctxt        = context.Background()
-	)
+func EmployeeChangeActive(id primitive.ObjectID) (employeeID primitive.ObjectID, err error) {
 
-	//Set filter active state data
-	_id, err := primitive.ObjectIDFromHex(id)
+	//Set filter
+	filter := bson.M{"_id": id}
+
+	//Get employee
+	employee, err := dao.EmployeeFindOne(filter)
 	if err != nil {
 		return
 	}
-	filter := bson.M{"_id": _id}
+
+	//Set active state data
 	update := bson.M{"$set": bson.M{"active": !employee.Active}}
 
 	//Update employee
-	_, err = employeeCol.UpdateOne(ctxt, filter, update)
-	if err != nil {
-		return
-	}
+	err = dao.EmployeeUpdateOne(filter, update)
 
 	//Return data
-	employeeStatus = !employee.Active
+	employeeID = employee.ID
 	return
 }
 
 // EmployeeDelete ...
-func EmployeeDelete(id string) (err error) {
-	var (
-		employeeCol = mongodb.EmployeeCol()
-		ctxt        = context.Background()
-	)
+func EmployeeDelete(id primitive.ObjectID) (err error) {
 
 	//Set filter
-	_id, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-	filter := bson.M{"_id": _id}
+	filter := bson.M{"_id": id}
 
 	//Delete employee
-	_, err = employeeCol.DeleteOne(ctxt, filter)
+	err = dao.EmployeeDelete(filter)
 	return
 }
