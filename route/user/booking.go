@@ -11,8 +11,8 @@ func userBooking(g *echo.Group) {
 	group := g.Group("/bookings")
 
 	group.GET("/", controller.BookingList, validator.BookingFindRequest)
-	group.GET("/:id", controller.BookingDetail, validator.BookingOwner, validator.BookingCheckExistance)
+	group.GET("/:id", controller.BookingDetail, validator.BookingOwner)
 	group.POST("/", controller.BookingCreate, validator.BookingCreate)
-	group.PATCH("/:id", controller.BookingUpdate, validator.BookingOwner, validator.BookingCheckExistance, validator.BookingUpdate)
-	group.DELETE("/:id", controller.BookingDelete, validator.BookingOwner, validator.BookingCheckExistance)
+	group.PATCH("/:id", controller.BookingUpdate, validator.BookingOwner, validator.BookingUpdate)
+	group.DELETE("/:id", controller.BookingDelete, validator.BookingOwner)
 }

@@ -201,15 +201,35 @@ func BookingFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 func BookingOwner(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			booking  = c.Get("booking").(model.Booking)
+			id       = c.Param("id")
+			_id      primitive.ObjectID
+			booking  model.Booking
 			customer = c.Get("authcustomer").(model.Customer)
 		)
+
+		//Bind ID
+		_id, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return util.Response400(c, err.Error())
+		}
+
+		//Set filter
+		filter := bson.M{"_id": _id}
+
+		//Validate booking
+		booking, err = dao.BookingFindOne(filter)
+		if err != nil {
+			return util.Response404(c, err.Error())
+		}
 
 		//Check if a user is also an owner
 		if customer.ID != booking.CustomerID {
 			err := errors.New("you are not the owner")
 			return util.Response401(c, err.Error())
 		}
+
+		//Set body and move to next process
+		c.Set("booking", booking)
 
 		//Move to next process
 		return next(c)
