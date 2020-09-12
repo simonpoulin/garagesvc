@@ -12,6 +12,6 @@ func adminCustomer(g *echo.Group) {
 
 	group.GET("/", controller.CustomerList, validator.CustomerFindRequest)
 	group.GET("/:id", controller.CustomerDetail, validator.CustomerCheckExistance)
-	group.PATCH("/:id", controller.CustomerUpdate, validator.CustomerCheckExistance, validator.CustomerValid)
+	group.PATCH("/:id", controller.CustomerUpdate, validator.CustomerCheckExistance, validator.CustomerUpdate)
 	group.DELETE("/:id", controller.CustomerDelete, validator.CustomerCheckExistance)
 }

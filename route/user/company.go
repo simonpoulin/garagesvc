@@ -10,6 +10,6 @@ import (
 func userCompany(g *echo.Group) {
 	group := g.Group("/companies")
 
-	group.GET("/", controller.CompanyList)
+	group.GET("/", controller.CompanyList, validator.CompanyFindRequest)
 	group.GET("/:id", controller.CompanyDetail, validator.CompanyCheckExistance)
 }

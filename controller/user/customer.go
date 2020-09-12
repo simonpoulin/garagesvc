@@ -30,7 +30,7 @@ func CustomerDetail(c echo.Context) error {
 func CustomerUpdate(c echo.Context) error {
 	var (
 		customer = c.Get("customer").(model.Customer)
-		payload  = c.Get("body").(model.CustomerPayload)
+		payload  = c.Get("body").(model.CustomerUpdatePayload)
 	)
 
 	//Update customer

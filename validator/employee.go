@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"errors"
 	"garagesvc/dao"
 	"garagesvc/model"
 	"garagesvc/util"
@@ -27,6 +28,21 @@ func EmployeeCreate(next echo.HandlerFunc) echo.HandlerFunc {
 
 		//Validate struct
 		if err != nil {
+			return util.Response400(c, err.Error())
+		}
+
+		//Check phone number is existed
+		//Set filter
+		filter := bson.M{"phone": payload.Phone}
+
+		//Looking for customer from database
+		_, err = dao.EmployeeFindOne(filter)
+		if err != nil {
+			if err.Error() != "mongo: no documents in result" {
+				return util.Response400(c, err.Error())
+			}
+		} else {
+			err = errors.New("phone number existed")
 			return util.Response400(c, err.Error())
 		}
 
@@ -88,18 +104,19 @@ func EmployeeUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 func EmployeeCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			id       primitive.ObjectID
+			id       = c.Param("id")
+			_id      primitive.ObjectID
 			employee model.Employee
 		)
 
 		//Bind ID
-		id, err := primitive.ObjectIDFromHex(c.Param("id"))
+		_id, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
 			return util.Response400(c, err.Error())
 		}
 
 		//Set filter
-		filter := bson.M{"_id": id}
+		filter := bson.M{"_id": _id}
 
 		//Validate employee
 		employee, err = dao.EmployeeFindOne(filter)

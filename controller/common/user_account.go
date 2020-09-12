@@ -11,7 +11,7 @@ import (
 // CustomerRegister ...
 func CustomerRegister(c echo.Context) error {
 	var (
-		payload = c.Get("body").(model.CustomerPayload)
+		payload = c.Get("body").(model.CustomerCreatePayload)
 	)
 
 	//Create customer

@@ -21,10 +21,16 @@ type CustomerLoginPayload struct {
 	Password string `json:"password" bson:"password" valid:"required, type(string), stringlength(6|20)"`
 }
 
-// CustomerPayload ...
-type CustomerPayload struct {
+// CustomerCreatePayload ...
+type CustomerCreatePayload struct {
 	Name     string `json:"name" bson:"name" valid:"required, stringlength(1|20)"`
 	Phone    string `json:"phone" bson:"phone" valid:"required, type(string), stringlength(10|10)"`
+	Password string `json:"password" bson:"password" valid:"required, type(string), stringlength(6|20)"`
+}
+
+// CustomerUpdatePayload ...
+type CustomerUpdatePayload struct {
+	Name     string `json:"name" bson:"name" valid:"required, stringlength(1|20)"`
 	Password string `json:"password" bson:"password" valid:"required, type(string), stringlength(6|20)"`
 }
 

@@ -24,12 +24,46 @@ func BookingCreate(next echo.HandlerFunc) echo.HandlerFunc {
 		if err := c.Bind(&payload); err != nil {
 			return util.Response400(c, err.Error())
 		}
-		_, err := govalidator.ValidateStruct(payload)
 
 		//Validate struct
+		_, err := govalidator.ValidateStruct(payload)
 		if err != nil {
 			return util.Response400(c, err.Error())
 		}
+
+		//Check valid customer ID
+		ctmID, err := primitive.ObjectIDFromHex(payload.CustomerID)
+		if err != nil {
+			return util.Response400(c, err.Error())
+		}
+
+		//Set filter
+		filter := bson.M{"_id": ctmID}
+
+		//Validate customer
+		_, err = dao.CustomerFindOne(filter)
+		if err != nil {
+			return util.Response404(c, err.Error())
+		}
+
+		//Check valid service ID
+		svcID, err := primitive.ObjectIDFromHex(payload.ServiceID)
+		if err != nil {
+			return util.Response400(c, err.Error())
+		}
+
+		//Set filter
+		filter = bson.M{"_id": svcID}
+
+		//Validate service
+		_, err = dao.ServiceFindOne(filter)
+		if err != nil {
+			return util.Response404(c, err.Error())
+		}
+
+		//Set IDs for payload
+		payload.CustomerObjectID = ctmID
+		payload.ServiceObjectID = svcID
 
 		//Set body and move to next process
 		c.Set("body", payload)
@@ -54,6 +88,24 @@ func BookingUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return util.Response400(c, err.Error())
 		}
+
+		//Check valid service ID
+		svcID, err := primitive.ObjectIDFromHex(payload.ServiceID)
+		if err != nil {
+			return util.Response400(c, err.Error())
+		}
+
+		//Set filter
+		filter := bson.M{"_id": svcID}
+
+		//Validate service
+		_, err = dao.ServiceFindOne(filter)
+		if err != nil {
+			return util.Response404(c, err.Error())
+		}
+
+		//Set IDs for payload
+		payload.ServiceObjectID = svcID
 
 		//Set body and move to next process
 		c.Set("body", payload)

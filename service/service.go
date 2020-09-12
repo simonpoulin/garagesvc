@@ -14,7 +14,7 @@ func ServiceCreate(payload model.ServiceCreatePayload) (serviceID primitive.Obje
 	var service model.Service
 
 	//Set data for new service
-	service.CompanyID = payload.CompanyID
+	service.CompanyID = payload.CompanyObjectID
 	service.ID = primitive.NewObjectID()
 	service.Location = payload.Location
 	service.Active = false
@@ -55,7 +55,7 @@ func ServiceList(active string, name string, companyID primitive.ObjectID, page 
 	}
 
 	if companyID.Hex() != "000000000000000000000000" {
-		filterParts = append(filterParts, bson.M{"company_id": companyID})
+		filterParts = append(filterParts, bson.M{"companyid": companyID})
 	}
 
 	//Getting filter query

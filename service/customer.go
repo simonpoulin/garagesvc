@@ -44,14 +44,13 @@ func CustomerList(name string, page int) (customerList interface{}, err error) {
 }
 
 // CustomerUpdate ...
-func CustomerUpdate(id primitive.ObjectID, payload model.CustomerPayload) (customerID primitive.ObjectID, err error) {
+func CustomerUpdate(id primitive.ObjectID, payload model.CustomerUpdatePayload) (customerID primitive.ObjectID, err error) {
 
 	//Set filter and data
 	filter := bson.M{"_id": id}
 	update := bson.M{"$set": bson.M{
 		"password": util.Hash(payload.Password),
 		"name":     payload.Name,
-		"phone":    payload.Phone,
 	}}
 
 	//Update customer

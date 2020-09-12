@@ -30,6 +30,24 @@ func ServiceCreate(next echo.HandlerFunc) echo.HandlerFunc {
 			return util.Response400(c, err.Error())
 		}
 
+		//Check valid company ID
+		cpnID, err := primitive.ObjectIDFromHex(payload.CompanyID)
+		if err != nil {
+			return util.Response400(c, err.Error())
+		}
+
+		//Set filter
+		filter := bson.M{"_id": cpnID}
+
+		//Validate company
+		_, err = dao.CompanyFindOne(filter)
+		if err != nil {
+			return util.Response404(c, err.Error())
+		}
+
+		//Set IDs for payload
+		payload.CompanyObjectID = cpnID
+
 		//Set body and move to next process
 		c.Set("body", payload)
 		return next(c)
@@ -64,18 +82,19 @@ func ServiceUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 func ServiceCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			id      primitive.ObjectID
+			id      = c.Param("id")
+			_id     primitive.ObjectID
 			service model.Service
 		)
 
 		//Bind ID
-		id, err := primitive.ObjectIDFromHex(c.Param("id"))
+		_id, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
 			return util.Response400(c, err.Error())
 		}
 
 		//Set filter
-		filter := bson.M{"_id": id}
+		filter := bson.M{"_id": _id}
 
 		//Validate service
 		service, err = dao.ServiceFindOne(filter)

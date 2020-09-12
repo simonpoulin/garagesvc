@@ -11,7 +11,7 @@ import (
 )
 
 // CustomerRegister ...
-func CustomerRegister(payload model.CustomerPayload) (customerID primitive.ObjectID, err error) {
+func CustomerRegister(payload model.CustomerCreatePayload) (customerID primitive.ObjectID, err error) {
 	var customer model.Customer
 
 	//Set data for new customer

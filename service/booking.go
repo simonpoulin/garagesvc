@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"garagesvc/dao"
 	"garagesvc/model"
 	"garagesvc/util"
@@ -20,9 +19,9 @@ func BookingCreate(payload model.BookingCreatePayload, customerID interface{}) (
 	if customerID != nil {
 		booking.CustomerID = customerID.(primitive.ObjectID)
 	} else {
-		booking.CustomerID = payload.CustomerID
+		booking.CustomerID = payload.CustomerObjectID
 	}
-	booking.ServiceID = payload.ServiceID
+	booking.ServiceID = payload.ServiceObjectID
 	booking.ID = primitive.NewObjectID()
 	booking.Status = "Pending"
 	booking.Date = payload.Date
@@ -60,14 +59,13 @@ func BookingList(status string, serviceID primitive.ObjectID, customerID primiti
 	}
 
 	if serviceID.Hex() != "000000000000000000000000" {
-		filterParts = append(filterParts, bson.M{"service_id": serviceID})
+		filterParts = append(filterParts, bson.M{"serviceid": serviceID})
 	}
 
 	if customerID.Hex() != "000000000000000000000000" {
-		filterParts = append(filterParts, bson.M{"customer_id": customerID})
+		filterParts = append(filterParts, bson.M{"customerid": customerID})
 	}
-	fmt.Println(serviceID)
-	fmt.Println(customerID)
+
 	//Set filter query from parts
 	findQuery = append(findQuery, bson.M{"$match": func() bson.M {
 		if filterParts != nil {
@@ -97,9 +95,9 @@ func BookingUpdate(id primitive.ObjectID, payload model.BookingUpdatePayload) (b
 	//Set filter and data
 	filter := bson.M{"_id": id}
 	data := bson.M{"$set": bson.M{
-		"service_id": payload.ServiceID,
-		"date":       payload.Date,
-		"note":       payload.Note,
+		"serviceid": payload.ServiceObjectID,
+		"date":      payload.Date,
+		"note":      payload.Note,
 	}}
 
 	//Update booking

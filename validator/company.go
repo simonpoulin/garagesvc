@@ -64,18 +64,19 @@ func CompanyUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 func CompanyCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			id      primitive.ObjectID
+			id      = c.Param("id")
+			_id     primitive.ObjectID
 			company model.Company
 		)
 
 		//Bind ID
-		id, err := primitive.ObjectIDFromHex(c.Param("id"))
+		_id, err := primitive.ObjectIDFromHex(id)
 		if err != nil {
 			return util.Response400(c, err.Error())
 		}
 
 		//Set filter
-		filter := bson.M{"_id": id}
+		filter := bson.M{"_id": _id}
 
 		//Validate company
 		company, err = dao.CompanyFindOne(filter)

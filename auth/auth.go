@@ -23,7 +23,12 @@ func LoggedInAsCustomer(next echo.HandlerFunc) echo.HandlerFunc {
 			return util.Response401(c, "")
 		}
 
-		tokenString := strings.Split(authHeader, " ")[1]
+		authToken := strings.Split(authHeader, " ")
+		if len(authToken) < 2 {
+			return util.Response401(c, "")
+		}
+
+		tokenString := authToken[1]
 		if tokenString == "" {
 			return util.Response401(c, "")
 		}
@@ -75,7 +80,12 @@ func LoggedInAsEmployee(next echo.HandlerFunc) echo.HandlerFunc {
 			return util.Response401(c, "")
 		}
 
-		tokenString := strings.Split(authHeader, " ")[1]
+		authToken := strings.Split(authHeader, " ")
+		if len(authToken) < 2 {
+			return util.Response401(c, "")
+		}
+
+		tokenString := authToken[1]
 		if tokenString == "" {
 			return util.Response401(c, "")
 		}
