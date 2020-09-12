@@ -1,10 +1,15 @@
 package route
 
-import "github.com/labstack/echo/v4"
+import (
+	"garagesvc/route/admin"
+	"garagesvc/route/user"
+
+	"github.com/labstack/echo/v4"
+)
 
 // Bootstrap ...
 func Bootstrap(e *echo.Echo) {
-	admin(e)
-	user(e)
+	admin.RouteAdmin(e)
+	user.RouteUser(e)
 	common(e)
 }

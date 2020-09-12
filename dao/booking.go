@@ -29,13 +29,13 @@ func BookingFindOne(filter interface{}) (booking model.Booking, err error) {
 }
 
 // BookingFind ...
-func BookingFind(filter interface{}) (bookingList []model.Booking, err error) {
+func BookingFind(filter []bson.M) (bookingList []model.Booking, err error) {
 	var (
 		bookingCol = mongodb.BookingCol()
 		ctx        = context.Background()
 	)
 	// Looking for bookings
-	cur, err := bookingCol.Find(ctx, bson.M{})
+	cur, err := bookingCol.Aggregate(ctx, filter)
 	if err != nil {
 		return
 	}

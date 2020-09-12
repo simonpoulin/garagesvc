@@ -4,6 +4,7 @@ import (
 	"garagesvc/dao"
 	"garagesvc/model"
 	"garagesvc/util"
+	"strconv"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo/v4"
@@ -108,6 +109,38 @@ func EmployeeCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 
 		//Set body and move to next process
 		c.Set("employee", employee)
+		return next(c)
+	}
+}
+
+// EmployeeFindRequest ...
+func EmployeeFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var (
+			page   = c.QueryParam("page")
+			active = c.QueryParam("active")
+			p      = 0
+			err    error
+		)
+
+		//Check valid page param
+		if page != "" {
+			p, err = strconv.Atoi(page)
+			if err != nil {
+				return util.Response400(c, err.Error())
+			}
+		}
+		c.Set("page", p)
+
+		//Check valid page param
+		if active != "" {
+			_, err = strconv.ParseBool(active)
+			if err != nil {
+				return util.Response400(c, err.Error())
+			}
+		}
+
+		//Move to next process
 		return next(c)
 	}
 }

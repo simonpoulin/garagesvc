@@ -1,4 +1,4 @@
-package controller
+package admin
 
 import (
 	"garagesvc/model"
@@ -7,42 +7,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 )
-
-// CustomerCreate ...
-func CustomerCreate(c echo.Context) error {
-	var (
-		payload = c.Get("body").(model.CustomerPayload)
-	)
-
-	//Create customer
-	result, err := service.CustomerCreate(payload)
-
-	//If error, return 404
-	if err != nil {
-		return util.Response404(c, err.Error())
-	}
-
-	//Return 200
-	return util.Response200(c, "", result)
-}
-
-// CustomerLogin ...
-func CustomerLogin(c echo.Context) error {
-	var (
-		payload = c.Get("body").(model.CustomerLoginPayload)
-	)
-
-	//Create token
-	result, err := service.CustomerLogin(payload)
-
-	//If error, return 404
-	if err != nil {
-		return util.Response404(c, err.Error())
-	}
-
-	//Return 200
-	return util.Response200(c, "", result)
-}
 
 // CustomerDetail ...
 func CustomerDetail(c echo.Context) error {
@@ -64,9 +28,13 @@ func CustomerDetail(c echo.Context) error {
 
 // CustomerList ...
 func CustomerList(c echo.Context) error {
+	var (
+		name = c.QueryParam("name")
+		page = c.Get("page").(int)
+	)
 
 	//Get customer list
-	result, err := service.CustomerList()
+	result, err := service.CustomerList(name, page)
 
 	//If error, return 404
 	if err != nil {

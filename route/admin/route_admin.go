@@ -1,4 +1,4 @@
-package route
+package admin
 
 import (
 	"garagesvc/auth"
@@ -6,7 +6,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func admin(e *echo.Echo) {
+// RouteAdmin ...
+func RouteAdmin(e *echo.Echo) {
 	group := e.Group("/admin")
 
 	group.Use(auth.LoggedInAsEmployee)

@@ -1,8 +1,11 @@
 package service
 
 import (
+	"fmt"
 	"garagesvc/dao"
 	"garagesvc/model"
+	"garagesvc/util"
+	"strconv"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -10,11 +13,15 @@ import (
 )
 
 // BookingCreate ...
-func BookingCreate(payload model.BookingCreatePayload) (bookingID string, err error) {
+func BookingCreate(payload model.BookingCreatePayload, customerID interface{}) (bookingID string, err error) {
 	var booking model.Booking
 
 	//Set data for new booking
-	booking.CustomerID = payload.CustomerID
+	if customerID != nil {
+		booking.CustomerID = customerID.(primitive.ObjectID)
+	} else {
+		booking.CustomerID = payload.CustomerID
+	}
 	booking.ServiceID = payload.ServiceID
 	booking.ID = primitive.NewObjectID()
 	booking.Status = "Pending"
@@ -40,43 +47,47 @@ func BookingDetail(id primitive.ObjectID) (booking model.Booking, err error) {
 }
 
 // BookingList ...
-func BookingList() (bookingList []model.Booking, err error) {
+func BookingList(status string, serviceID primitive.ObjectID, customerID primitive.ObjectID, page int) (bookingList interface{}, err error) {
+	var (
+		filterParts []bson.M
+		findQuery   []bson.M
+	)
+
+	//Set filter parts
+	if status != "" {
+		stt, _ := strconv.ParseBool(status)
+		filterParts = append(filterParts, bson.M{"status": stt})
+	}
+
+	if serviceID.Hex() != "000000000000000000000000" {
+		filterParts = append(filterParts, bson.M{"service_id": serviceID})
+	}
+
+	if customerID.Hex() != "000000000000000000000000" {
+		filterParts = append(filterParts, bson.M{"customer_id": customerID})
+	}
+	fmt.Println(serviceID)
+	fmt.Println(customerID)
+	//Set filter query from parts
+	findQuery = append(findQuery, bson.M{"$match": func() bson.M {
+		if filterParts != nil {
+			if len(filterParts) > 0 {
+				return bson.M{"$and": filterParts}
+			}
+		}
+		return bson.M{}
+	}()})
 
 	//Get bookings
-	bookingList, err = dao.BookingFind(bson.M{})
-	return
-}
+	bookings, err := dao.BookingFind(findQuery)
 
-// BookingListByStatus ...
-func BookingListByStatus(status string) (bookingList []model.Booking, err error) {
+	//Paging list
+	if page > 0 {
+		bookingList, err = util.Paging(bookings, page, 8)
+		return
+	}
+	bookingList = bookings
 
-	//Set filter
-	filter := bson.M{"status": status}
-
-	//Get bookings
-	bookingList, err = dao.BookingFind(filter)
-	return
-}
-
-// BookingListByServiceID ...
-func BookingListByServiceID(serviceID primitive.ObjectID) (bookingList []model.Booking, err error) {
-
-	//Set filter
-	filter := bson.M{"service_id": serviceID}
-
-	//Get bookings
-	bookingList, err = dao.BookingFind(filter)
-	return
-}
-
-// BookingListByCustomerID ...
-func BookingListByCustomerID(customerID primitive.ObjectID) (bookingList []model.Booking, err error) {
-
-	//Set filter
-	filter := bson.M{"customer_id": customerID}
-
-	//Get bookings
-	bookingList, err = dao.BookingFind(filter)
 	return
 }
 

@@ -29,13 +29,13 @@ func EmployeeFindOne(filter interface{}) (employee model.Employee, err error) {
 }
 
 // EmployeeFind ...
-func EmployeeFind(filter interface{}) (employeeList []model.Employee, err error) {
+func EmployeeFind(filter []bson.M) (employeeList []model.Employee, err error) {
 	var (
 		employeeCol = mongodb.EmployeeCol()
 		ctx         = context.Background()
 	)
 	// Looking for employees
-	cur, err := employeeCol.Find(ctx, bson.M{})
+	cur, err := employeeCol.Aggregate(ctx, filter)
 	if err != nil {
 		return
 	}

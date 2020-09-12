@@ -4,8 +4,6 @@ import (
 	"context"
 	"garagesvc/model"
 	"garagesvc/module/mongodb"
-
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 // CustomerCreate ...
@@ -35,7 +33,7 @@ func CustomerFind(filter interface{}) (customerList []model.Customer, err error)
 		ctx         = context.Background()
 	)
 	// Looking for customers
-	cur, err := customerCol.Find(ctx, bson.M{})
+	cur, err := customerCol.Find(ctx, filter)
 	if err != nil {
 		return
 	}

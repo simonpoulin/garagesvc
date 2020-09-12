@@ -1,48 +1,14 @@
 package service
 
 import (
-	"errors"
 	"garagesvc/dao"
 	"garagesvc/model"
 	"garagesvc/util"
+	"strconv"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-// EmployeeCreate ...
-func EmployeeCreate(payload model.EmployeeCreatePayload) (employeeID primitive.ObjectID, err error) {
-	var employee model.Employee
-
-	//Set data for new employee
-	employee.ID = primitive.NewObjectID()
-	employee.Active = true
-	employee.Password = util.Hash(payload.Password)
-	employee.Name = payload.Name
-	employee.Phone = payload.Phone
-
-	//Insert to database
-	err = dao.EmployeeCreate(employee)
-	employeeID = employee.ID
-	return
-}
-
-// EmployeeLogin ...
-func EmployeeLogin(payload model.EmployeeLoginPayload) (token string, err error) {
-
-	//Get employee by phone number
-	payload.Password = util.Hash(payload.Password)
-	filter := bson.M{"phone": payload.Phone}
-	employee, err := dao.EmployeeFindOne(filter)
-
-	//Check password match
-	if payload.Password != employee.Password {
-		err = errors.New("password not match")
-		return
-	}
-	token, err = employee.GenerateToken()
-	return
-}
 
 // EmployeeDetail ...
 func EmployeeDetail(id primitive.ObjectID) (employee model.Employee, err error) {
@@ -55,21 +21,42 @@ func EmployeeDetail(id primitive.ObjectID) (employee model.Employee, err error) 
 }
 
 // EmployeeList ...
-func EmployeeList() (employeeList []model.Employee, err error) {
+func EmployeeList(active string, name string, page int) (employeeList interface{}, err error) {
+	var (
+		filterParts []bson.M
+		findQuery   []bson.M
+	)
 
-	//Get employees
-	employeeList, err = dao.EmployeeFind(bson.M{})
-	return
-}
+	//Set filter parts
+	if active != "" {
+		stt, _ := strconv.ParseBool(active)
+		filterParts = append(filterParts, bson.M{"active": stt})
+	}
 
-// EmployeeListByActiveState ...
-func EmployeeListByActiveState(active string) (employeeList []model.Employee, err error) {
+	if name != "" {
+		filterParts = append(filterParts, bson.M{"name": bson.M{"$regex": name}})
+	}
 
-	//Set filter
-	filter := bson.M{"active": active}
+	//Set filter query from parts
+	findQuery = append(findQuery, bson.M{"$match": func() bson.M {
+		if filterParts != nil {
+			if len(filterParts) > 0 {
+				return bson.M{"$and": filterParts}
+			}
+		}
+		return bson.M{}
+	}()})
 
-	//Get employees
-	employeeList, err = dao.EmployeeFind(filter)
+	//Get employee list
+	employees, err := dao.EmployeeFind(findQuery)
+
+	//Paging list
+	if page > 0 {
+		employeeList, err = util.Paging(employees, page, 8)
+		return
+	}
+	employeeList = employees
+
 	return
 }
 
@@ -80,7 +67,7 @@ func EmployeeUpdate(id primitive.ObjectID, payload model.EmployeeUpdatePayload) 
 	filter := bson.M{"_id": id}
 	update := bson.M{"$set": bson.M{
 		"active":   payload.Active,
-		"password": payload.Password,
+		"password": util.Hash(payload.Password),
 		"name":     payload.Name,
 		"phone":    payload.Phone,
 	}}
@@ -90,29 +77,6 @@ func EmployeeUpdate(id primitive.ObjectID, payload model.EmployeeUpdatePayload) 
 
 	//Return data
 	employeeID = id
-	return
-}
-
-// EmployeeChangeActive ...
-func EmployeeChangeActive(id primitive.ObjectID) (employeeID primitive.ObjectID, err error) {
-
-	//Set filter
-	filter := bson.M{"_id": id}
-
-	//Get employee
-	employee, err := dao.EmployeeFindOne(filter)
-	if err != nil {
-		return
-	}
-
-	//Set active state data
-	update := bson.M{"$set": bson.M{"active": !employee.Active}}
-
-	//Update employee
-	err = dao.EmployeeUpdateOne(filter, update)
-
-	//Return data
-	employeeID = employee.ID
 	return
 }
 

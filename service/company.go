@@ -3,6 +3,7 @@ package service
 import (
 	"garagesvc/dao"
 	"garagesvc/model"
+	"garagesvc/util"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -37,10 +38,25 @@ func CompanyDetail(id primitive.ObjectID) (company model.Company, err error) {
 }
 
 // CompanyList ...
-func CompanyList() (companyList []model.Company, err error) {
+func CompanyList(name string, page int) (companyList interface{}, err error) {
+	var (
+		filter = bson.M{}
+	)
 
-	//Get companys
-	companyList, err = dao.CompanyFind(bson.M{})
+	if name != "" {
+		filter = bson.M{"name": bson.M{"$regex": name}}
+	}
+
+	//Get companies
+	companies, err := dao.CompanyFind(filter)
+
+	//Paging list
+	if page > 0 {
+		companyList, err = util.Paging(companies, page, 8)
+		return
+	}
+	companyList = companies
+
 	return
 }
 
@@ -61,27 +77,6 @@ func CompanyUpdate(id primitive.ObjectID, payload model.CompanyUpdatePayload) (c
 
 	//Return data
 	companyID = id
-	return
-}
-
-// CompanyChangeActive ...
-func CompanyChangeActive(id primitive.ObjectID) (companyID primitive.ObjectID, err error) {
-
-	//Set filter
-	filter := bson.M{"_id": id}
-	company, err := dao.CompanyFindOne(filter)
-	if err != nil {
-		return
-	}
-
-	//Set active state data
-	update := bson.M{"$set": bson.M{"active": !company.Active}}
-
-	//Update company
-	err = dao.CompanyUpdateOne(filter, update)
-
-	//Return data
-	companyID = company.ID
 	return
 }
 

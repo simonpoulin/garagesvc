@@ -1,7 +1,7 @@
-package route
+package user
 
 import (
-	"garagesvc/controller"
+	controller "garagesvc/controller/user"
 	"garagesvc/validator"
 
 	"github.com/labstack/echo/v4"

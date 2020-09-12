@@ -1,4 +1,4 @@
-package controller
+package user
 
 import (
 	"garagesvc/model"
@@ -6,16 +6,18 @@ import (
 	"garagesvc/util"
 
 	"github.com/labstack/echo/v4"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // BookingCreate ...
 func BookingCreate(c echo.Context) error {
 	var (
-		payload = c.Get("body").(model.BookingCreatePayload)
+		payload    = c.Get("body").(model.BookingCreatePayload)
+		customerID = c.Get("authcustomer").(model.Customer).ID
 	)
 
 	//Create booking
-	result, err := service.BookingCreate(payload)
+	result, err := service.BookingCreate(payload, customerID)
 
 	//If error, return 404
 	if err != nil {
@@ -46,63 +48,15 @@ func BookingDetail(c echo.Context) error {
 
 // BookingList ...
 func BookingList(c echo.Context) error {
-
-	//Get booking list
-	result, err := service.BookingList()
-
-	//If error, return 400
-	if err != nil {
-		return util.Response400(c, err.Error())
-	}
-
-	//Return 200
-	return util.Response200(c, "", result)
-}
-
-// BookingListByStatus ...
-func BookingListByStatus(c echo.Context) error {
 	var (
-		status = c.Param("status")
+		status     = c.QueryParam("status")
+		serviceID  = c.Get("serviceID").(primitive.ObjectID)
+		customerID = c.Get("authcustomer").(model.Customer).ID
+		page       = c.Get("page").(int)
 	)
 
 	//Get booking list
-	result, err := service.BookingListByStatus(status)
-
-	//If error, return 404
-	if err != nil {
-		return util.Response404(c, err.Error())
-	}
-
-	//Return 200
-	return util.Response200(c, "", result)
-}
-
-// BookingListByServiceID ...
-func BookingListByServiceID(c echo.Context) error {
-	var (
-		svc = c.Get("service").(model.Service)
-	)
-
-	//Get booking list
-	result, err := service.BookingListByServiceID(svc.ID)
-
-	//If error, return 404
-	if err != nil {
-		return util.Response404(c, err.Error())
-	}
-
-	//Return 200
-	return util.Response200(c, "", result)
-}
-
-// BookingListByCustomerID ...
-func BookingListByCustomerID(c echo.Context) error {
-	var (
-		customer = c.Get("customer").(model.Customer)
-	)
-
-	//Get booking list
-	result, err := service.BookingListByCustomerID(customer.ID)
+	result, err := service.BookingList(status, serviceID, customerID, page)
 
 	//If error, return 400
 	if err != nil {

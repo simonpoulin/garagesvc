@@ -1,4 +1,4 @@
-package controller
+package admin
 
 import (
 	"garagesvc/model"
@@ -46,9 +46,13 @@ func CompanyDetail(c echo.Context) error {
 
 // CompanyList ...
 func CompanyList(c echo.Context) error {
+	var (
+		name = c.QueryParam("name")
+		page = c.Get("page").(int)
+	)
 
 	//Get company list
-	result, err := service.CompanyList()
+	result, err := service.CompanyList(name, page)
 
 	//If error, return 404
 	if err != nil {
@@ -68,24 +72,6 @@ func CompanyUpdate(c echo.Context) error {
 
 	//Update company
 	result, err := service.CompanyUpdate(company.ID, payload)
-
-	//If error, return 404
-	if err != nil {
-		return util.Response404(c, err.Error())
-	}
-
-	//Return 200
-	return util.Response200(c, "", result)
-}
-
-// CompanyChangeActive ...
-func CompanyChangeActive(c echo.Context) error {
-	var (
-		company = c.Get("company").(model.Company)
-	)
-
-	//Change company active state
-	result, err := service.CompanyChangeActive(company.ID)
 
 	//If error, return 404
 	if err != nil {

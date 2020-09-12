@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"garagesvc/dao"
 	"garagesvc/model"
 	"garagesvc/util"
@@ -9,42 +8,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-// CustomerCreate ...
-func CustomerCreate(payload model.CustomerPayload) (customerID primitive.ObjectID, err error) {
-	var customer model.Customer
-
-	//Set data for new customer
-	customer.ID = primitive.NewObjectID()
-	customer.Password = util.Hash(payload.Password)
-	customer.Name = payload.Name
-	customer.Phone = payload.Phone
-
-	//Insert to database
-	err = dao.CustomerCreate(customer)
-	customerID = customer.ID
-	return
-}
-
-// CustomerLogin ...
-func CustomerLogin(payload model.CustomerLoginPayload) (token string, err error) {
-
-	//Get customer by phone number
-	payload.Password = util.Hash(payload.Password)
-	filter := bson.M{"phone": payload.Phone}
-	customer, err := dao.CustomerFindOne(filter)
-	if err != nil {
-		return
-	}
-
-	//Check password match
-	if payload.Password != customer.Password {
-		err = errors.New("password not match")
-		return
-	}
-	token, err = customer.GenerateToken()
-	return
-}
 
 // CustomerDetail ...
 func CustomerDetail(id primitive.ObjectID) (customer model.Customer, err error) {
@@ -58,10 +21,25 @@ func CustomerDetail(id primitive.ObjectID) (customer model.Customer, err error) 
 }
 
 // CustomerList ...
-func CustomerList() (customerList []model.Customer, err error) {
+func CustomerList(name string, page int) (customerList interface{}, err error) {
+	var (
+		filter = bson.M{}
+	)
+
+	if name != "" {
+		filter = bson.M{"name": bson.M{"$regex": name}}
+	}
 
 	//Get customers
-	customerList, err = dao.CustomerFind(bson.M{})
+	customers, err := dao.CustomerFind(filter)
+
+	//Paging list
+	if page > 0 {
+		customerList, err = util.Paging(customers, page, 8)
+		return
+	}
+	customerList = customers
+
 	return
 }
 
@@ -71,7 +49,7 @@ func CustomerUpdate(id primitive.ObjectID, payload model.CustomerPayload) (custo
 	//Set filter and data
 	filter := bson.M{"_id": id}
 	update := bson.M{"$set": bson.M{
-		"password": payload.Password,
+		"password": util.Hash(payload.Password),
 		"name":     payload.Name,
 		"phone":    payload.Phone,
 	}}

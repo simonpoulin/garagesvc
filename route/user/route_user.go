@@ -1,4 +1,4 @@
-package route
+package user
 
 import (
 	"garagesvc/auth"
@@ -6,7 +6,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func user(e *echo.Echo) {
+// RouteUser ...
+func RouteUser(e *echo.Echo) {
 	group := e.Group("/user")
 
 	group.Use(auth.LoggedInAsCustomer)

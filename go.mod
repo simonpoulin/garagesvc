@@ -5,13 +5,16 @@ go 1.14
 require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/asaskevich/govalidator v0.0.0-20200819183940-29e1ff8eb0bb
+	github.com/astaxie/beego v1.12.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/flosch/pongo2 v0.0.0-20200805083417-63c99409991d
 	github.com/go-openapi/runtime v0.19.20
 	github.com/go-openapi/spec v0.19.9 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-playground/validator/v10 v10.3.0
 	github.com/go-swagger/go-swagger v0.25.0 // indirect
+	github.com/gobeam/mongo-go-pagination v0.0.1
 	github.com/gorilla/handlers v1.5.0 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/kr/pretty v0.2.1 // indirect

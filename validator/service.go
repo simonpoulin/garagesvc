@@ -4,6 +4,7 @@ import (
 	"garagesvc/dao"
 	"garagesvc/model"
 	"garagesvc/util"
+	"strconv"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo/v4"
@@ -84,6 +85,49 @@ func ServiceCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 
 		//Set body and move to next process
 		c.Set("service", service)
+		return next(c)
+	}
+}
+
+// ServiceFindRequest ...
+func ServiceFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var (
+			companyID                    = c.QueryParam("company_id")
+			page                         = c.QueryParam("page")
+			active                       = c.QueryParam("active")
+			p                            = 0
+			cpnID     primitive.ObjectID = [12]byte{}
+			err       error
+		)
+
+		//Check valid page param
+		if page != "" {
+			p, err = strconv.Atoi(page)
+			if err != nil {
+				return util.Response400(c, err.Error())
+			}
+		}
+		c.Set("page", p)
+
+		//Check valid page param
+		if active != "" {
+			_, err = strconv.ParseBool(active)
+			if err != nil {
+				return util.Response400(c, err.Error())
+			}
+		}
+
+		//Check valid companyID and set body
+		if companyID != "" {
+			cpnID, err = primitive.ObjectIDFromHex(companyID)
+			if err != nil {
+				return util.Response400(c, err.Error())
+			}
+		}
+		c.Set("companyID", cpnID)
+
+		//Move to next process
 		return next(c)
 	}
 }

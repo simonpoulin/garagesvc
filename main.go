@@ -16,7 +16,7 @@ import (
 // @version 1.0.0
 // @description Documentation of Garage Service API
 //
-// @host localhost:9999
+// @host localhost:9998
 // @BasePath /
 
 func init() {

@@ -29,13 +29,13 @@ func ServiceFindOne(filter interface{}) (service model.Service, err error) {
 }
 
 // ServiceFind ...
-func ServiceFind(filter interface{}) (serviceList []model.Service, err error) {
+func ServiceFind(filter []bson.M) (serviceList []model.Service, err error) {
 	var (
 		serviceCol = mongodb.ServiceCol()
 		ctx        = context.Background()
 	)
 	// Looking for services
-	cur, err := serviceCol.Find(ctx, bson.M{})
+	cur, err := serviceCol.Aggregate(ctx, filter)
 	if err != nil {
 		return
 	}

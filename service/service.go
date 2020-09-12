@@ -3,6 +3,7 @@ package service
 import (
 	"garagesvc/dao"
 	"garagesvc/model"
+	"garagesvc/util"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -38,32 +39,45 @@ func ServiceDetail(id primitive.ObjectID) (service model.Service, err error) {
 }
 
 // ServiceList ...
-func ServiceList() (serviceList []model.Service, err error) {
+func ServiceList(active string, name string, companyID primitive.ObjectID, page int) (serviceList interface{}, err error) {
+	var (
+		filterParts []bson.M
+		findQuery   []bson.M
+	)
 
-	//Get services by company ID
-	serviceList, err = dao.ServiceFind(bson.M{})
-	return
-}
+	//Filter parts
+	if active != "" {
+		filterParts = append(filterParts, bson.M{"active": active})
+	}
 
-// ServiceListByCompanyID ...
-func ServiceListByCompanyID(companyID primitive.ObjectID) (serviceList []model.Service, err error) {
+	if name != "" {
+		filterParts = append(filterParts, bson.M{"name": bson.M{"$regex": name}})
+	}
 
-	//Set filter
-	filter := bson.M{"company_id": companyID}
+	if companyID.Hex() != "000000000000000000000000" {
+		filterParts = append(filterParts, bson.M{"company_id": companyID})
+	}
 
-	//Get services by company ID
-	serviceList, err = dao.ServiceFind(filter)
-	return
-}
-
-// ServiceListByActiveState ...
-func ServiceListByActiveState(active string) (serviceList []model.Service, err error) {
-
-	//Set filter
-	filter := bson.M{"active": active}
+	//Getting filter query
+	findQuery = append(findQuery, bson.M{"$match": func() bson.M {
+		if filterParts != nil {
+			if len(filterParts) > 0 {
+				return bson.M{"$and": filterParts}
+			}
+		}
+		return bson.M{}
+	}()})
 
 	//Get services
-	serviceList, err = dao.ServiceFind(filter)
+	services, err := dao.ServiceFind(findQuery)
+
+	//Paging list
+	if page > 0 {
+		serviceList, err = util.Paging(services, page, 8)
+		return
+	}
+	serviceList = services
+
 	return
 }
 
@@ -84,29 +98,6 @@ func ServiceUpdate(id primitive.ObjectID, payload model.ServiceUpdatePayload) (s
 
 	//Return data
 	serviceID = id
-	return
-}
-
-// ServiceChangeActive ...
-func ServiceChangeActive(id primitive.ObjectID) (serviceID primitive.ObjectID, err error) {
-
-	//Set filter
-	filter := bson.M{"_id": id}
-
-	//Get service
-	service, err := dao.ServiceFindOne(filter)
-	if err != nil {
-		return
-	}
-
-	//Set active state data
-	update := bson.M{"$set": bson.M{"active": !service.Active}}
-
-	//Update service
-	err = dao.ServiceUpdateOne(filter, update)
-
-	//Return data
-	serviceID = service.ID
 	return
 }
 

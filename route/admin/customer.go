@@ -1,7 +1,7 @@
-package route
+package admin
 
 import (
-	"garagesvc/controller"
+	controller "garagesvc/controller/admin"
 	"garagesvc/validator"
 
 	"github.com/labstack/echo/v4"
@@ -10,7 +10,7 @@ import (
 func adminCustomer(g *echo.Group) {
 	group := g.Group("/customers")
 
-	group.GET("/", controller.CustomerList)
+	group.GET("/", controller.CustomerList, validator.CustomerFindRequest)
 	group.GET("/:id", controller.CustomerDetail, validator.CustomerCheckExistance)
 	group.PATCH("/:id", controller.CustomerUpdate, validator.CustomerCheckExistance, validator.CustomerValid)
 	group.DELETE("/:id", controller.CustomerDelete, validator.CustomerCheckExistance)
