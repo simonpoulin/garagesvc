@@ -68,10 +68,11 @@ func CompanyUpdate(c echo.Context) error {
 	var (
 		company = c.Get("company").(model.Company)
 		payload = c.Get("body").(model.CompanyUpdatePayload)
+		active  = c.QueryParam("active")
 	)
 
 	//Update company
-	result, err := service.CompanyUpdate(company.ID, payload)
+	result, err := service.CompanyUpdate(company.ID, payload, active)
 
 	//If error, return 404
 	if err != nil {

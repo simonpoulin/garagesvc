@@ -11,7 +11,7 @@ import (
 // CustomerDetail ...
 func CustomerDetail(c echo.Context) error {
 	var (
-		customer = c.Get("customer").(model.Customer)
+		customer = c.Get("authcustomer").(model.Customer)
 	)
 
 	//Get customer by ID
@@ -29,7 +29,7 @@ func CustomerDetail(c echo.Context) error {
 // CustomerUpdate ...
 func CustomerUpdate(c echo.Context) error {
 	var (
-		customer = c.Get("customer").(model.Customer)
+		customer = c.Get("authcustomer").(model.Customer)
 		payload  = c.Get("body").(model.CustomerUpdatePayload)
 	)
 

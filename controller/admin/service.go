@@ -71,10 +71,11 @@ func ServiceUpdate(c echo.Context) error {
 	var (
 		svc     = c.Get("service").(model.Service)
 		payload = c.Get("body").(model.ServiceUpdatePayload)
+		active  = c.QueryParam("active")
 	)
 
 	//Update service
-	result, err := service.ServiceUpdate(svc.ID, payload)
+	result, err := service.ServiceUpdate(svc.ID, payload, active)
 
 	//If error, return 404
 	if err != nil {

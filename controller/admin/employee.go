@@ -82,10 +82,11 @@ func EmployeeUpdate(c echo.Context) error {
 	var (
 		employee = c.Get("employee").(model.Employee)
 		payload  = c.Get("body").(model.EmployeeUpdatePayload)
+		active   = c.QueryParam("active")
 	)
 
 	//Update employee
-	result, err := service.EmployeeUpdate(employee.ID, payload)
+	result, err := service.EmployeeUpdate(employee.ID, payload, active)
 
 	//If error, return 404
 	if err != nil {

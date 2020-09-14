@@ -4,6 +4,7 @@ import (
 	"garagesvc/dao"
 	"garagesvc/model"
 	"garagesvc/util"
+	"strconv"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -82,16 +83,24 @@ func ServiceList(active string, name string, companyID primitive.ObjectID, page 
 }
 
 // ServiceUpdate ...
-func ServiceUpdate(id primitive.ObjectID, payload model.ServiceUpdatePayload) (serviceID primitive.ObjectID, err error) {
+func ServiceUpdate(id primitive.ObjectID, payload model.ServiceUpdatePayload, active string) (serviceID primitive.ObjectID, err error) {
+
+	var update bson.M
 
 	//Set filter and data
 	filter := bson.M{"_id": id}
-	update := bson.M{"$set": bson.M{
-		"active":   payload.Active,
-		"address":  payload.Address,
-		"name":     payload.Name,
-		"location": payload.Location,
-	}}
+
+	if active != "" {
+		stt, _ := strconv.ParseBool(active)
+		update = bson.M{"$set": bson.M{"active": stt}}
+	} else {
+		update = bson.M{"$set": bson.M{
+			"active":   payload.Active,
+			"address":  payload.Address,
+			"name":     payload.Name,
+			"location": payload.Location,
+		}}
+	}
 
 	//Update service
 	err = dao.ServiceUpdateOne(filter, update)

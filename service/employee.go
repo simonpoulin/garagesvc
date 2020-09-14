@@ -61,16 +61,24 @@ func EmployeeList(active string, name string, page int) (employeeList interface{
 }
 
 // EmployeeUpdate ...
-func EmployeeUpdate(id primitive.ObjectID, payload model.EmployeeUpdatePayload) (employeeID primitive.ObjectID, err error) {
+func EmployeeUpdate(id primitive.ObjectID, payload model.EmployeeUpdatePayload, active string) (employeeID primitive.ObjectID, err error) {
+
+	var update bson.M
 
 	//Set filter and data
 	filter := bson.M{"_id": id}
-	update := bson.M{"$set": bson.M{
-		"active":   payload.Active,
-		"password": util.Hash(payload.Password),
-		"name":     payload.Name,
-		"phone":    payload.Phone,
-	}}
+
+	if active != "" {
+		stt, _ := strconv.ParseBool(active)
+		update = bson.M{"$set": bson.M{"active": stt}}
+	} else {
+		update = bson.M{"$set": bson.M{
+			"active":   payload.Active,
+			"password": util.Hash(payload.Password),
+			"name":     payload.Name,
+			"phone":    payload.Phone,
+		}}
+	}
 
 	//Update employee
 	err = dao.EmployeeUpdateOne(filter, update)

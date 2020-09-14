@@ -10,6 +10,6 @@ import (
 func userCustomer(g *echo.Group) {
 	group := g.Group("/customers")
 
-	group.GET("/:id", controller.CustomerDetail, validator.CustomerOwner)
-	group.PATCH("/:id", controller.CustomerUpdate, validator.CustomerOwner, validator.CustomerUpdate)
+	group.GET("/", controller.CustomerDetail, validator.CustomerOwner)
+	group.PATCH("/", controller.CustomerUpdate, validator.CustomerUpdate)
 }

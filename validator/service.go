@@ -59,17 +59,26 @@ func ServiceUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
 			payload model.ServiceUpdatePayload
+			active  = c.QueryParam("active")
 		)
 
-		//Bind and parse to struct
-		if err := c.Bind(&payload); err != nil {
-			return util.Response400(c, err.Error())
-		}
-		_, err := govalidator.ValidateStruct(payload)
+		//If active query param not empty, ignore payload
+		if active != "" {
+			_, err := strconv.ParseBool(active)
+			if err != nil {
+				return util.Response400(c, err.Error())
+			}
+		} else {
+			//Bind and parse to struct
+			if err := c.Bind(&payload); err != nil {
+				return util.Response400(c, err.Error())
+			}
+			_, err := govalidator.ValidateStruct(payload)
 
-		//Validate struct
-		if err != nil {
-			return util.Response400(c, err.Error())
+			//Validate struct
+			if err != nil {
+				return util.Response400(c, err.Error())
+			}
 		}
 
 		//Set body and move to next process
