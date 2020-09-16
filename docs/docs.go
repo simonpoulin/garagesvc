@@ -61,6 +61,12 @@ var doc = `{
                         "description": "Customer's ID",
                         "name": "customerid",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -345,6 +351,12 @@ var doc = `{
                         "type": "string",
                         "description": "Active state",
                         "name": "active",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
                         "in": "query"
                     }
                 ],
@@ -632,6 +644,12 @@ var doc = `{
                         "description": "Name keyword",
                         "name": "name",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -861,6 +879,12 @@ var doc = `{
                         "type": "string",
                         "description": "Active state",
                         "name": "active",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
                         "in": "query"
                     }
                 ],
@@ -1102,6 +1126,12 @@ var doc = `{
                         "type": "string",
                         "description": "Active state",
                         "name": "active",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
                         "in": "query"
                     }
                 ],
@@ -1607,6 +1637,12 @@ var doc = `{
                         "description": "Customer's ID",
                         "name": "customerid",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1892,6 +1928,12 @@ var doc = `{
                         "description": "Active state",
                         "name": "active",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2129,6 +2171,12 @@ var doc = `{
                         "type": "string",
                         "description": "Active state",
                         "name": "active",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
                         "in": "query"
                     }
                 ],

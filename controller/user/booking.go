@@ -92,6 +92,7 @@ func BookingDetail(c echo.Context) error {
 // @Param status query string false "Status state"
 // @Param serviceid query string false "Service's ID"
 // @Param customerid query string false "Customer's ID"
+// @Param page query int false "Page number"
 //
 // @Success 200 {object} util.Response
 // @Failure 400 {object} util.Response

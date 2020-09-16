@@ -159,6 +159,10 @@ paths:
         in: query
         name: customerid
         type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:
@@ -341,6 +345,10 @@ paths:
         in: query
         name: active
         type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:
@@ -523,6 +531,10 @@ paths:
         in: query
         name: name
         type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:
@@ -670,6 +682,10 @@ paths:
         in: query
         name: active
         type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:
@@ -824,6 +840,10 @@ paths:
         in: query
         name: active
         type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:
@@ -1149,6 +1169,10 @@ paths:
         in: query
         name: customerid
         type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:
@@ -1331,6 +1355,10 @@ paths:
         in: query
         name: active
         type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:
@@ -1483,6 +1511,10 @@ paths:
         in: query
         name: active
         type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:

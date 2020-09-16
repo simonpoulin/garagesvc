@@ -54,6 +54,7 @@ func EmployeeDetail(c echo.Context) error {
 //
 // @Param name query string false "Name keyword"
 // @Param active query string false "Active state"
+// @Param page query int false "Page number"
 //
 // @Success 200 {object} util.Response
 // @Failure 400 {object} util.Response
