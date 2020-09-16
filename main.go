@@ -16,8 +16,12 @@ import (
 // @version 1.0.0
 // @description Documentation of Garage Service API
 //
-// @host localhost:9998
+// @host micasvn.ddns.net:9999
 // @BasePath /
+//
+// @securityDefinitions.apikey BearerToken
+// @in header
+// @name Authorization
 
 func init() {
 	config.Init()

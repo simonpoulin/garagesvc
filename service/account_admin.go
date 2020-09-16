@@ -10,8 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// EmployeeCreate ...
-func EmployeeCreate(payload model.EmployeeCreatePayload) (employeeID primitive.ObjectID, err error) {
+// EmployeeRegister ...
+func EmployeeRegister(payload model.EmployeeRegisterPayload) (employeeID primitive.ObjectID, err error) {
 	var employee model.Employee
 
 	//Set data for new employee

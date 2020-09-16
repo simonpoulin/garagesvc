@@ -136,9 +136,8 @@ func ServiceFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 				return util.Response400(c, err.Error())
 			}
 		}
-		c.Set("page", p)
 
-		//Check valid page param
+		//Check valid active param
 		if active != "" {
 			_, err = strconv.ParseBool(active)
 			if err != nil {
@@ -146,16 +145,17 @@ func ServiceFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 		}
 
-		//Check valid companyID and set body
+		//Check valid companyID param
 		if companyID != "" {
 			cpnID, err = primitive.ObjectIDFromHex(companyID)
 			if err != nil {
 				return util.Response400(c, err.Error())
 			}
 		}
-		c.Set("companyID", cpnID)
 
-		//Move to next process
+		//Set body and move to next process
+		c.Set("page", p)
+		c.Set("companyID", cpnID)
 		return next(c)
 	}
 }

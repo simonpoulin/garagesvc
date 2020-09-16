@@ -8,7 +8,24 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// CustomerDetail ...
+// CustomerDetail godoc
+//
+// @Summary Admin API - Customer detail
+// @Description Return details of a customer
+// @Tags Admin - Customers
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param id path string true "Customer's ID"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /admin/customers/{id} [get]
 func CustomerDetail(c echo.Context) error {
 	var (
 		customer = c.Get("customer").(model.Customer)
@@ -26,7 +43,24 @@ func CustomerDetail(c echo.Context) error {
 	return util.Response200(c, "", result)
 }
 
-// CustomerList ...
+// CustomerList godoc
+//
+// @Summary Admin API - Customer list
+// @Description Return a list of customers
+// @Tags Admin - Customers
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param name query string false "Name keyword"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /admin/customers/ [get]
 func CustomerList(c echo.Context) error {
 	var (
 		name = c.QueryParam("name")
@@ -45,7 +79,25 @@ func CustomerList(c echo.Context) error {
 	return util.Response200(c, "", result)
 }
 
-// CustomerUpdate ...
+// CustomerUpdate godoc
+//
+// @Summary Admin API - Customer update
+// @Description Update customer's details
+// @Tags Admin - Customers
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param id path string true "Customer's ID"
+// @Param CustomerUpdatePayload body model.CustomerUpdatePayload true "Customer Update Payload"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /admin/customers/{id} [patch]
 func CustomerUpdate(c echo.Context) error {
 	var (
 		customer = c.Get("customer").(model.Customer)
@@ -64,7 +116,24 @@ func CustomerUpdate(c echo.Context) error {
 	return util.Response200(c, "", result)
 }
 
-// CustomerDelete ...
+// CustomerDelete godoc
+//
+// @Summary Admin API - Customer delete
+// @Description Delete a customer
+// @Tags Admin - Customers
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param id path string true "Customer's ID"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /admin/customers/{id} [delete]
 func CustomerDelete(c echo.Context) error {
 	var (
 		customer = c.Get("customer").(model.Customer)

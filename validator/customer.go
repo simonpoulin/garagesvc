@@ -13,11 +13,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// CustomerCreate ...
-func CustomerCreate(next echo.HandlerFunc) echo.HandlerFunc {
+// CustomerRegister ...
+func CustomerRegister(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			payload model.CustomerCreatePayload
+			payload model.CustomerRegisterPayload
 		)
 
 		//Bind and parse to struct

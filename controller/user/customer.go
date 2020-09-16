@@ -8,7 +8,24 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// CustomerDetail ...
+// CustomerDetail godoc
+//
+// @Summary User API - Customer detail
+// @Description Return details of a customer
+// @Tags User - Customers
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param id path string true "Customer's ID"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /user/customers/{id} [get]
 func CustomerDetail(c echo.Context) error {
 	var (
 		customer = c.Get("authcustomer").(model.Customer)
@@ -26,7 +43,25 @@ func CustomerDetail(c echo.Context) error {
 	return util.Response200(c, "", result)
 }
 
-// CustomerUpdate ...
+// CustomerUpdate godoc
+//
+// @Summary User API - Customer update
+// @Description Update customer's details
+// @Tags User - Customers
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param id path string true "Customer's ID"
+// @Param CustomerUpdatePayload body model.CustomerUpdatePayload true "Customer Update Payload"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /user/customers/{id} [patch]
 func CustomerUpdate(c echo.Context) error {
 	var (
 		customer = c.Get("authcustomer").(model.Customer)

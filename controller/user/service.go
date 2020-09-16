@@ -9,7 +9,24 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// ServiceDetail ...
+// ServiceDetail godoc
+//
+// @Summary User API - Service detail
+// @Description Return service's details
+// @Tags User - Services
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param id path string true "Service's ID"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /user/services/{id} [get]
 func ServiceDetail(c echo.Context) error {
 	var (
 		svc = c.Get("service").(model.Service)
@@ -27,7 +44,26 @@ func ServiceDetail(c echo.Context) error {
 	return util.Response200(c, "", result)
 }
 
-// ServiceList ...
+// ServiceList godoc
+//
+// @Summary User API - List services
+// @Description Returns a list of services
+// @Tags User - Services
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param name query string false "Name keyword"
+// @Param companyid query string false "Company's ID"
+// @Param active query string false "Active state"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /user/services/ [get]
 func ServiceList(c echo.Context) error {
 	var (
 		active    = c.QueryParam("active")

@@ -103,9 +103,10 @@ func CompanyCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 func CompanyFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			page = c.QueryParam("page")
-			p    = 0
-			err  error
+			page   = c.QueryParam("page")
+			active = c.QueryParam("active")
+			p      = 0
+			err    error
 		)
 
 		//Check valid page param
@@ -115,9 +116,17 @@ func CompanyFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 				return util.Response400(c, err.Error())
 			}
 		}
-		c.Set("page", p)
 
-		//Move to next process
+		//Check valid active param
+		if active != "" {
+			_, err = strconv.ParseBool(active)
+			if err != nil {
+				return util.Response400(c, err.Error())
+			}
+		}
+
+		//Set body and move to next process
+		c.Set("page", p)
 		return next(c)
 	}
 }

@@ -9,7 +9,24 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// ServiceCreate ...
+// ServiceCreate godoc
+//
+// @Summary Admin API - Service create
+// @Description Create a service
+// @Tags Admin - Services
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param ServiceCreatePayload body model.ServiceCreatePayload true "Service Create Payload"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /admin/services/ [post]
 func ServiceCreate(c echo.Context) error {
 	var (
 		payload = c.Get("body").(model.ServiceCreatePayload)
@@ -27,7 +44,24 @@ func ServiceCreate(c echo.Context) error {
 	return util.Response200(c, "", result)
 }
 
-// ServiceDetail ...
+// ServiceDetail godoc
+//
+// @Summary Admin API - Service detail
+// @Description Return service's details
+// @Tags Admin - Services
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param id path string true "Service's ID"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /admin/services/{id} [get]
 func ServiceDetail(c echo.Context) error {
 	var (
 		svc = c.Get("service").(model.Service)
@@ -45,7 +79,26 @@ func ServiceDetail(c echo.Context) error {
 	return util.Response200(c, "", result)
 }
 
-// ServiceList ...
+// ServiceList godoc
+//
+// @Summary Admin API - List services
+// @Description Returns a list of services
+// @Tags Admin - Services
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param name query string false "Name keyword"
+// @Param companyid query string false "Company's ID"
+// @Param active query string false "Active state"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /admin/services/ [get]
 func ServiceList(c echo.Context) error {
 	var (
 		active    = c.QueryParam("active")
@@ -66,7 +119,26 @@ func ServiceList(c echo.Context) error {
 	return util.Response200(c, "", result)
 }
 
-// ServiceUpdate ...
+// ServiceUpdate godoc
+//
+// @Summary Admin API - Service update
+// @Description Update service's details
+// @Tags Admin - Services
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param id path string true "Service's ID"
+// @Param active query string false "Active state"
+// @Param ServiceUpdatePayload body model.ServiceUpdatePayload false "Service Update Payload"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /admin/services/{id} [patch]
 func ServiceUpdate(c echo.Context) error {
 	var (
 		svc     = c.Get("service").(model.Service)
@@ -86,7 +158,24 @@ func ServiceUpdate(c echo.Context) error {
 	return util.Response200(c, "", result)
 }
 
-// ServiceDelete ...
+// ServiceDelete godoc
+//
+// @Summary Admin API - Service delete
+// @Description Delete an service
+// @Tags Admin - Services
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param id path string true "Service's ID"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /admin/services/{id} [delete]
 func ServiceDelete(c echo.Context) error {
 	var (
 		svc = c.Get("service").(model.Service)

@@ -12,12 +12,19 @@ import (
 //
 // @Summary Admin API - Employee detail
 // @Description Return employee's details
-// @Tags Admin|Employees
+// @Tags Admin - Employees
+//
 // @Accept  json
 // @Produce  json
+//
 // @Param id path string true "Employee's ID"
+//
 // @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
 // @Failure 404 {object} util.Response
+//
+// @Security BearerToken
 // @Router /admin/employees/{id} [get]
 func EmployeeDetail(c echo.Context) error {
 	var (
@@ -39,14 +46,21 @@ func EmployeeDetail(c echo.Context) error {
 // EmployeeList godoc
 //
 // @Summary Admin API - List employees
-// @Description Returns a list of all employees
-// @Tags Admin|Employees
+// @Description Returns a list of employees
+// @Tags Admin - Employees
+//
 // @Accept  json
 // @Produce  json
+//
+// @Param name query string false "Name keyword"
 // @Param active query string false "Active state"
-// @Param name query string false "Employee(s)'s name"
+//
 // @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
 // @Failure 404 {object} util.Response
+//
+// @Security BearerToken
 // @Router /admin/employees/ [get]
 func EmployeeList(c echo.Context) error {
 	var (
@@ -71,12 +85,21 @@ func EmployeeList(c echo.Context) error {
 //
 // @Summary Admin API - Employee update
 // @Description Update employee's details
-// @Tags Admin|Employees
+// @Tags Admin - Employees
+//
 // @Accept  json
 // @Produce  json
-// @Param id path string true "Employee ID"
+//
+// @Param id path string true "Employee's ID"
+// @Param active query string false "Active state"
+// @Param EmployeeUpdatePayload body model.EmployeeUpdatePayload false "Employee Update Payload"
+//
 // @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
 // @Failure 404 {object} util.Response
+//
+// @Security BearerToken
 // @Router /admin/employees/{id} [patch]
 func EmployeeUpdate(c echo.Context) error {
 	var (
@@ -101,12 +124,19 @@ func EmployeeUpdate(c echo.Context) error {
 //
 // @Summary Admin API - Employee delete
 // @Description Delete an employee
-// @Tags Admin|Employees
+// @Tags Admin - Employees
+//
 // @Accept  json
 // @Produce  json
-// @Param id path string true "Employee ID"
+//
+// @Param id path string true "Employee's ID"
+//
 // @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
 // @Failure 404 {object} util.Response
+//
+// @Security BearerToken
 // @Router /admin/employees/{id} [delete]
 func EmployeeDelete(c echo.Context) error {
 	var (

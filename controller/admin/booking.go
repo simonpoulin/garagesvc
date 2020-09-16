@@ -9,7 +9,24 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// BookingCreate ...
+// BookingCreate godoc
+//
+// @Summary Admin API - Booking create
+// @Description Create a booking
+// @Tags Admin - Bookings
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param BookingCreatePayload body model.BookingCreatePayload true "Booking Create Payload"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /admin/bookings/ [post]
 func BookingCreate(c echo.Context) error {
 	var (
 		payload = c.Get("body").(model.BookingCreatePayload)
@@ -27,7 +44,24 @@ func BookingCreate(c echo.Context) error {
 	return util.Response200(c, "", result)
 }
 
-// BookingDetail ...
+// BookingDetail godoc
+//
+// @Summary Admin API - Booking detail
+// @Description Return details of a booking
+// @Tags Admin - Bookings
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param id path string true "Booking ID"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /admin/bookings/{id} [get]
 func BookingDetail(c echo.Context) error {
 	var (
 		booking = c.Get("booking").(model.Booking)
@@ -45,7 +79,26 @@ func BookingDetail(c echo.Context) error {
 	return util.Response200(c, "", result)
 }
 
-// BookingList ...
+// BookingList godoc
+//
+// @Summary Admin API - Booking list
+// @Description Return a list of bookings
+// @Tags Admin - Bookings
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param status query string false "Status state"
+// @Param serviceid query string false "Service's ID"
+// @Param customerid query string false "Customer's ID"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /admin/bookings/ [get]
 func BookingList(c echo.Context) error {
 	var (
 		status     = c.QueryParam("status")
@@ -66,7 +119,25 @@ func BookingList(c echo.Context) error {
 	return util.Response200(c, "", result)
 }
 
-// BookingUpdate ...
+// BookingUpdate godoc
+//
+// @Summary Admin API - Booking update
+// @Description Update booking's details
+// @Tags Admin - Bookings
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param id path string true "Booking's ID"
+// @Param BookingUpdatePayload body model.BookingUpdatePayload true "Booking Update Payload"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /admin/bookings/{id} [patch]
 func BookingUpdate(c echo.Context) error {
 	var (
 		booking = c.Get("booking").(model.Booking)
@@ -85,7 +156,24 @@ func BookingUpdate(c echo.Context) error {
 	return util.Response200(c, "", result)
 }
 
-// BookingDelete ...
+// BookingDelete godoc
+//
+// @Summary Admin API - Booking delete
+// @Description Delete a booking
+// @Tags Admin - Bookings
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param id path string true "Booking's ID"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Security BearerToken
+// @Router /admin/bookings/{id} [delete]
 func BookingDelete(c echo.Context) error {
 	var (
 		booking = c.Get("booking").(model.Booking)

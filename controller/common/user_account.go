@@ -8,10 +8,26 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// CustomerRegister ...
+// CustomerRegister godoc
+//
+// @Summary User API - Customer Register
+// @Description Create an customer
+// @Tags Common
+//
+// @Accept  json
+// @Produce  json
+//
+// @Param CustomerRegisterPayload body model.CustomerRegisterPayload true "Customer Register Payload"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Router /customer-register [post]
 func CustomerRegister(c echo.Context) error {
 	var (
-		payload = c.Get("body").(model.CustomerCreatePayload)
+		payload = c.Get("body").(model.CustomerRegisterPayload)
 	)
 
 	//Create customer
@@ -26,7 +42,23 @@ func CustomerRegister(c echo.Context) error {
 	return util.Response200(c, "", result)
 }
 
-// CustomerLogin ...
+// CustomerLogin godoc
+//
+// @Summary User API - Customer Login
+// @Description Return a token for logging customer
+// @Tags Common
+//
+// @Accept  application/json
+// @Produce  json
+//
+// @Param CustomerLoginPayload body model.CustomerLoginPayload true "Customer Login Payload"
+//
+// @Success 200 {object} util.Response
+// @Failure 400 {object} util.Response
+// @Failure 401 {object} util.Response
+// @Failure 404 {object} util.Response
+//
+// @Router /customer-login [post]
 func CustomerLogin(c echo.Context) error {
 	var (
 		payload = c.Get("body").(model.CustomerLoginPayload)

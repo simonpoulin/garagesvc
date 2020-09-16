@@ -1,5 +1,131 @@
 basePath: /
 definitions:
+  model.BookingCreatePayload:
+    properties:
+      customerObjectID:
+        type: string
+      customerid:
+        type: string
+      note:
+        type: string
+      serviceObjectID:
+        type: string
+      serviceid:
+        type: string
+      time:
+        type: string
+    type: object
+  model.BookingUpdatePayload:
+    properties:
+      note:
+        type: string
+      serviceObjectID:
+        type: string
+      serviceid:
+        type: string
+      time:
+        type: string
+    type: object
+  model.CompanyCreatePayload:
+    properties:
+      address:
+        type: string
+      location:
+        $ref: '#/definitions/model.Location'
+        type: object
+      name:
+        type: string
+    type: object
+  model.CompanyUpdatePayload:
+    properties:
+      active:
+        type: boolean
+      address:
+        type: string
+      location:
+        $ref: '#/definitions/model.Location'
+        type: object
+      name:
+        type: string
+    type: object
+  model.CustomerLoginPayload:
+    properties:
+      password:
+        type: string
+      phone:
+        type: string
+    type: object
+  model.CustomerRegisterPayload:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+    type: object
+  model.CustomerUpdatePayload:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  model.EmployeeLoginPayload:
+    properties:
+      password:
+        type: string
+      phone:
+        type: string
+    type: object
+  model.EmployeeRegisterPayload:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+    type: object
+  model.EmployeeUpdatePayload:
+    properties:
+      active:
+        type: boolean
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+    type: object
+  model.Location:
+    type: object
+  model.ServiceCreatePayload:
+    properties:
+      address:
+        type: string
+      companyObjectID:
+        type: string
+      companyid:
+        type: string
+      location:
+        $ref: '#/definitions/model.Location'
+        type: object
+      name:
+        type: string
+    type: object
+  model.ServiceUpdatePayload:
+    properties:
+      active:
+        type: boolean
+      address:
+        type: string
+      location:
+        $ref: '#/definitions/model.Location'
+        type: object
+      name:
+        type: string
+    type: object
   util.Response:
     properties:
       data:
@@ -7,19 +133,32 @@ definitions:
       message:
         type: string
     type: object
-host: localhost:9998
+host: micasvn.ddns.net:9999
 info:
   contact: {}
-  description: This is a sample server celler server.
+  description: Documentation of Garage Service API
   license: {}
-  title: Swagger Example API
+  title: Garage Service API
   version: 1.0.0
 paths:
-  /employees/:
+  /admin/bookings/:
     get:
       consumes:
       - application/json
-      description: Returns list of all employees
+      description: Return a list of bookings
+      parameters:
+      - description: Status state
+        in: query
+        name: status
+        type: string
+      - description: Service's ID
+        in: query
+        name: serviceid
+        type: string
+      - description: Customer's ID
+        in: query
+        name: customerid
+        type: string
       produces:
       - application/json
       responses:
@@ -27,20 +166,541 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
         "404":
           description: Not Found
           schema:
             $ref: '#/definitions/util.Response'
-      summary: List employees
+      security:
+      - BearerToken: []
+      summary: Admin API - Booking list
       tags:
-      - Employees
-  /employees/{id}:
+      - Admin - Bookings
+    post:
+      consumes:
+      - application/json
+      description: Create a booking
+      parameters:
+      - description: Booking Create Payload
+        in: body
+        name: BookingCreatePayload
+        required: true
+        schema:
+          $ref: '#/definitions/model.BookingCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Booking create
+      tags:
+      - Admin - Bookings
+  /admin/bookings/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a booking
+      parameters:
+      - description: Booking's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Booking delete
+      tags:
+      - Admin - Bookings
+    get:
+      consumes:
+      - application/json
+      description: Return details of a booking
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Booking detail
+      tags:
+      - Admin - Bookings
+    patch:
+      consumes:
+      - application/json
+      description: Update booking's details
+      parameters:
+      - description: Booking's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Booking Update Payload
+        in: body
+        name: BookingUpdatePayload
+        required: true
+        schema:
+          $ref: '#/definitions/model.BookingUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Booking update
+      tags:
+      - Admin - Bookings
+  /admin/companies/:
+    get:
+      consumes:
+      - application/json
+      description: Return a list of companies
+      parameters:
+      - description: Name keyword
+        in: query
+        name: name
+        type: string
+      - description: Active state
+        in: query
+        name: active
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Company list
+      tags:
+      - Admin - Companies
+    post:
+      consumes:
+      - application/json
+      description: Create a company
+      parameters:
+      - description: Company Create Payload
+        in: body
+        name: CompanyCreatePayload
+        required: true
+        schema:
+          $ref: '#/definitions/model.CompanyCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Company create
+      tags:
+      - Admin - Companies
+  /admin/companies/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Return details of a company
+      parameters:
+      - description: Company's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Company detail
+      tags:
+      - Admin - Companies
+    patch:
+      consumes:
+      - application/json
+      description: Update company's details
+      parameters:
+      - description: Company's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Active state
+        in: query
+        name: active
+        type: string
+      - description: Company Update Payload
+        in: body
+        name: CompanyUpdatePayload
+        schema:
+          $ref: '#/definitions/model.CompanyUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Company update
+      tags:
+      - Admin - Companies
+  /admin/compnanies/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a company
+      parameters:
+      - description: Company's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Company delete
+      tags:
+      - Admin - Companies
+  /admin/customers/:
+    get:
+      consumes:
+      - application/json
+      description: Return a list of customers
+      parameters:
+      - description: Name keyword
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Customer list
+      tags:
+      - Admin - Customers
+  /admin/customers/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a customer
+      parameters:
+      - description: Customer's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Customer delete
+      tags:
+      - Admin - Customers
+    get:
+      consumes:
+      - application/json
+      description: Return details of a customer
+      parameters:
+      - description: Customer's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Customer detail
+      tags:
+      - Admin - Customers
+    patch:
+      consumes:
+      - application/json
+      description: Update customer's details
+      parameters:
+      - description: Customer's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Customer Update Payload
+        in: body
+        name: CustomerUpdatePayload
+        required: true
+        schema:
+          $ref: '#/definitions/model.CustomerUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Customer update
+      tags:
+      - Admin - Customers
+  /admin/employees/:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of employees
+      parameters:
+      - description: Name keyword
+        in: query
+        name: name
+        type: string
+      - description: Active state
+        in: query
+        name: active
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - List employees
+      tags:
+      - Admin - Employees
+  /admin/employees/{id}:
     delete:
       consumes:
       - application/json
       description: Delete an employee
       parameters:
-      - description: Employee ID
+      - description: Employee's ID
         in: path
         name: id
         required: true
@@ -52,19 +712,29 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
         "404":
           description: Not Found
           schema:
             $ref: '#/definitions/util.Response'
-      summary: Employee delete
+      security:
+      - BearerToken: []
+      summary: Admin API - Employee delete
       tags:
-      - Employees
+      - Admin - Employees
     get:
       consumes:
       - application/json
       description: Return employee's details
       parameters:
-      - description: Employee ID
+      - description: Employee's ID
         in: path
         name: id
         required: true
@@ -76,23 +746,42 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
         "404":
           description: Not Found
           schema:
             $ref: '#/definitions/util.Response'
-      summary: Employee detail
+      security:
+      - BearerToken: []
+      summary: Admin API - Employee detail
       tags:
-      - Employees
+      - Admin - Employees
     patch:
       consumes:
       - application/json
       description: Update employee's details
       parameters:
-      - description: Employee ID
+      - description: Employee's ID
         in: path
         name: id
         required: true
         type: string
+      - description: Active state
+        in: query
+        name: active
+        type: string
+      - description: Employee Update Payload
+        in: body
+        name: EmployeeUpdatePayload
+        schema:
+          $ref: '#/definitions/model.EmployeeUpdatePayload'
       produces:
       - application/json
       responses:
@@ -100,47 +789,109 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/util.Response'
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/util.Response'
-      summary: Employee update
-      tags:
-      - Employees
-  /employees/{id}/active:
-    patch:
-      consumes:
-      - application/json
-      description: Update employee's active state
-      parameters:
-      - description: Employee ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/util.Response'
         "404":
           description: Not Found
           schema:
             $ref: '#/definitions/util.Response'
-      summary: Employee update active state
+      security:
+      - BearerToken: []
+      summary: Admin API - Employee update
       tags:
-      - Employees
-  /employees/active/{active}:
+      - Admin - Employees
+  /admin/services/:
     get:
       consumes:
       - application/json
-      description: Return list of all employees by chosen status
+      description: Returns a list of services
       parameters:
+      - description: Name keyword
+        in: query
+        name: name
+        type: string
+      - description: Company's ID
+        in: query
+        name: companyid
+        type: string
       - description: Active state
-        in: path
+        in: query
         name: active
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - List services
+      tags:
+      - Admin - Services
+    post:
+      consumes:
+      - application/json
+      description: Create a service
+      parameters:
+      - description: Service Create Payload
+        in: body
+        name: ServiceCreatePayload
+        required: true
+        schema:
+          $ref: '#/definitions/model.ServiceCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Service create
+      tags:
+      - Admin - Services
+  /admin/services/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an service
+      parameters:
+      - description: Service's ID
+        in: path
+        name: id
         required: true
         type: string
       produces:
@@ -150,11 +901,650 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
         "404":
           description: Not Found
           schema:
             $ref: '#/definitions/util.Response'
-      summary: Employee list by active state
+      security:
+      - BearerToken: []
+      summary: Admin API - Service delete
       tags:
-      - Employees
+      - Admin - Services
+    get:
+      consumes:
+      - application/json
+      description: Return service's details
+      parameters:
+      - description: Service's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Service detail
+      tags:
+      - Admin - Services
+    patch:
+      consumes:
+      - application/json
+      description: Update service's details
+      parameters:
+      - description: Service's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Active state
+        in: query
+        name: active
+        type: string
+      - description: Service Update Payload
+        in: body
+        name: ServiceUpdatePayload
+        schema:
+          $ref: '#/definitions/model.ServiceUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: Admin API - Service update
+      tags:
+      - Admin - Services
+  /customer-login:
+    post:
+      consumes:
+      - application/json
+      description: Return a token for logging customer
+      parameters:
+      - description: Customer Login Payload
+        in: body
+        name: CustomerLoginPayload
+        required: true
+        schema:
+          $ref: '#/definitions/model.CustomerLoginPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: User API - Customer Login
+      tags:
+      - Common
+  /customer-register:
+    post:
+      consumes:
+      - application/json
+      description: Create an customer
+      parameters:
+      - description: Customer Register Payload
+        in: body
+        name: CustomerRegisterPayload
+        required: true
+        schema:
+          $ref: '#/definitions/model.CustomerRegisterPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: User API - Customer Register
+      tags:
+      - Common
+  /employee-login:
+    post:
+      consumes:
+      - application/json
+      description: Return a token for logging employee
+      parameters:
+      - description: Employee Login Payload
+        in: body
+        name: EmployeeLoginPayload
+        required: true
+        schema:
+          $ref: '#/definitions/model.EmployeeLoginPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: Admin API - Employee Login
+      tags:
+      - Common
+  /employee-register:
+    post:
+      consumes:
+      - application/json
+      description: Create an employee
+      parameters:
+      - description: Employee Register Payload
+        in: body
+        name: EmployeeRegisterPayload
+        required: true
+        schema:
+          $ref: '#/definitions/model.EmployeeRegisterPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      summary: Admin API - Employee Register
+      tags:
+      - Common
+  /user/bookings/:
+    get:
+      consumes:
+      - application/json
+      description: Return a list of bookings
+      parameters:
+      - description: Status state
+        in: query
+        name: status
+        type: string
+      - description: Service's ID
+        in: query
+        name: serviceid
+        type: string
+      - description: Customer's ID
+        in: query
+        name: customerid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: User API - Booking list
+      tags:
+      - User - Bookings
+    post:
+      consumes:
+      - application/json
+      description: Create a booking
+      parameters:
+      - description: Booking Create Payload
+        in: body
+        name: BookingCreatePayload
+        required: true
+        schema:
+          $ref: '#/definitions/model.BookingCreatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: User API - Booking create
+      tags:
+      - User - Bookings
+  /user/bookings/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a booking
+      parameters:
+      - description: Booking's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: User API - Booking delete
+      tags:
+      - User - Bookings
+    get:
+      consumes:
+      - application/json
+      description: Return details of a booking
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: User API - Booking detail
+      tags:
+      - User - Bookings
+    patch:
+      consumes:
+      - application/json
+      description: Update booking's details
+      parameters:
+      - description: Booking's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Booking Update Payload
+        in: body
+        name: BookingUpdatePayload
+        required: true
+        schema:
+          $ref: '#/definitions/model.BookingUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: User API - Booking update
+      tags:
+      - User - Bookings
+  /user/companies/:
+    get:
+      consumes:
+      - application/json
+      description: Return a list of companies
+      parameters:
+      - description: Name keyword
+        in: query
+        name: name
+        type: string
+      - description: Active state
+        in: query
+        name: active
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: User API - Company list
+      tags:
+      - User - Companies
+  /user/companies/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Return details of a company
+      parameters:
+      - description: Company's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: User API - Company detail
+      tags:
+      - User - Companies
+  /user/customers/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Return details of a customer
+      parameters:
+      - description: Customer's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: User API - Customer detail
+      tags:
+      - User - Customers
+    patch:
+      consumes:
+      - application/json
+      description: Update customer's details
+      parameters:
+      - description: Customer's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Customer Update Payload
+        in: body
+        name: CustomerUpdatePayload
+        required: true
+        schema:
+          $ref: '#/definitions/model.CustomerUpdatePayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: User API - Customer update
+      tags:
+      - User - Customers
+  /user/services/:
+    get:
+      consumes:
+      - application/json
+      description: Returns a list of services
+      parameters:
+      - description: Name keyword
+        in: query
+        name: name
+        type: string
+      - description: Company's ID
+        in: query
+        name: companyid
+        type: string
+      - description: Active state
+        in: query
+        name: active
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: User API - List services
+      tags:
+      - User - Services
+  /user/services/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Return service's details
+      parameters:
+      - description: Service's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerToken: []
+      summary: User API - Service detail
+      tags:
+      - User - Services
+securityDefinitions:
+  BearerToken:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

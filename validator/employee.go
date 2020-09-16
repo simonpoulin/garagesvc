@@ -13,11 +13,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// EmployeeCreate ...
-func EmployeeCreate(next echo.HandlerFunc) echo.HandlerFunc {
+// EmployeeRegister ...
+func EmployeeRegister(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			payload model.EmployeeCreatePayload
+			payload model.EmployeeRegisterPayload
 		)
 
 		//Bind and parse to struct
@@ -156,9 +156,8 @@ func EmployeeFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 				return util.Response400(c, err.Error())
 			}
 		}
-		c.Set("page", p)
 
-		//Check valid page param
+		//Check valid active param
 		if active != "" {
 			_, err = strconv.ParseBool(active)
 			if err != nil {
@@ -166,7 +165,8 @@ func EmployeeFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 		}
 
-		//Move to next process
+		//Set body and move to next process
+		c.Set("page", p)
 		return next(c)
 	}
 }

@@ -51,5 +51,5 @@ func ServiceCol() *mongo.Collection {
 
 // CustomerCol ...
 func CustomerCol() *mongo.Collection {
-	return db.Collection("Users")
+	return db.Collection("Customers")
 }

@@ -39,17 +39,33 @@ func CompanyDetail(id primitive.ObjectID) (company model.Company, err error) {
 }
 
 // CompanyList ...
-func CompanyList(name string, page int) (companyList interface{}, err error) {
+func CompanyList(name string, page int, active string) (companyList interface{}, err error) {
 	var (
-		filter = bson.M{}
+		filterParts []bson.M
+		findQuery   []bson.M
 	)
-
-	if name != "" {
-		filter = bson.M{"name": bson.M{"$regex": name}}
+	//Set filter parts
+	if active != "" {
+		stt, _ := strconv.ParseBool(active)
+		filterParts = append(filterParts, bson.M{"active": stt})
 	}
 
+	if name != "" {
+		filterParts = append(filterParts, bson.M{"name": bson.M{"$regex": name}})
+	}
+
+	//Set filter query from parts
+	findQuery = append(findQuery, bson.M{"$match": func() bson.M {
+		if filterParts != nil {
+			if len(filterParts) > 0 {
+				return bson.M{"$and": filterParts}
+			}
+		}
+		return bson.M{}
+	}()})
+
 	//Get companies
-	companies, err := dao.CompanyFind(filter)
+	companies, err := dao.CompanyFind(findQuery)
 
 	//Paging list
 	if page > 0 {
