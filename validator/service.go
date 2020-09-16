@@ -124,7 +124,7 @@ func ServiceFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 			companyID                    = c.QueryParam("company_id")
 			page                         = c.QueryParam("page")
 			active                       = c.QueryParam("active")
-			p                            = 0
+			p                            = 1
 			cpnID     primitive.ObjectID = [12]byte{}
 			err       error
 		)

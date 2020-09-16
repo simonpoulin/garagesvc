@@ -21,7 +21,7 @@ func CustomerDetail(id primitive.ObjectID) (customer model.Customer, err error) 
 }
 
 // CustomerList ...
-func CustomerList(name string, page int) (customerList interface{}, err error) {
+func CustomerList(name string, page int) (customerList util.PagedList, err error) {
 	var (
 		filter = bson.M{}
 	)
@@ -32,13 +32,12 @@ func CustomerList(name string, page int) (customerList interface{}, err error) {
 
 	//Get customers
 	customers, err := dao.CustomerFind(filter)
-
-	//Paging list
-	if page > 0 {
-		customerList, err = util.Paging(customers, page, 8)
+	if err != nil {
 		return
 	}
-	customerList = customers
+
+	//Paging list
+	customerList, err = util.Paging(customers, page, 8)
 
 	return
 }

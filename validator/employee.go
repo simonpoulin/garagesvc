@@ -145,7 +145,7 @@ func EmployeeFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 		var (
 			page   = c.QueryParam("page")
 			active = c.QueryParam("active")
-			p      = 0
+			p      = 1
 			err    error
 		)
 

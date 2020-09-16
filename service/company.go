@@ -39,7 +39,7 @@ func CompanyDetail(id primitive.ObjectID) (company model.Company, err error) {
 }
 
 // CompanyList ...
-func CompanyList(name string, page int, active string) (companyList interface{}, err error) {
+func CompanyList(name string, page int, active string) (companyList util.PagedList, err error) {
 	var (
 		filterParts []bson.M
 		findQuery   []bson.M
@@ -66,13 +66,12 @@ func CompanyList(name string, page int, active string) (companyList interface{},
 
 	//Get companies
 	companies, err := dao.CompanyFind(findQuery)
-
-	//Paging list
-	if page > 0 {
-		companyList, err = util.Paging(companies, page, 8)
+	if err != nil {
 		return
 	}
-	companyList = companies
+
+	//Paging list
+	companyList, err = util.Paging(companies, page, 8)
 
 	return
 }

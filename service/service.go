@@ -40,7 +40,7 @@ func ServiceDetail(id primitive.ObjectID) (service model.Service, err error) {
 }
 
 // ServiceList ...
-func ServiceList(active string, name string, companyID primitive.ObjectID, page int) (serviceList interface{}, err error) {
+func ServiceList(active string, name string, companyID primitive.ObjectID, page int) (serviceList util.PagedList, err error) {
 	var (
 		filterParts []bson.M
 		findQuery   []bson.M
@@ -71,13 +71,12 @@ func ServiceList(active string, name string, companyID primitive.ObjectID, page 
 
 	//Get services
 	services, err := dao.ServiceFind(findQuery)
-
-	//Paging list
-	if page > 0 {
-		serviceList, err = util.Paging(services, page, 8)
+	if err != nil {
 		return
 	}
-	serviceList = services
+
+	//Paging list
+	serviceList, err = util.Paging(services, page, 8)
 
 	return
 }

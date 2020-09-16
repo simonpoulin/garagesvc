@@ -173,7 +173,7 @@ func CustomerFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
 			page = c.QueryParam("page")
-			p    = 0
+			p    = 1
 			err  error
 		)
 

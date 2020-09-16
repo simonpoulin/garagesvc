@@ -29,7 +29,7 @@ func Paging(list interface{}, page int, limit int) (pagedList PagedList, err err
 
 	// Calculate total pages
 	totalPage := int(math.Ceil(float64(len(unpagedList)) / float64(limit)))
-	if pagedList.TotalPage > page {
+	if totalPage < page {
 		err = errors.New("out of pages")
 		return
 	}
@@ -65,6 +65,7 @@ func interfaceSlice(slice interface{}) (itf []interface{}, err error) {
 	s := reflect.ValueOf(slice)
 	if s.Kind() != reflect.Slice {
 		err = errors.New("not a slice")
+		return
 	}
 
 	//Convert slice into interface slice

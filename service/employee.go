@@ -21,7 +21,7 @@ func EmployeeDetail(id primitive.ObjectID) (employee model.Employee, err error) 
 }
 
 // EmployeeList ...
-func EmployeeList(active string, name string, page int) (employeeList interface{}, err error) {
+func EmployeeList(active string, name string, page int) (employeeList util.PagedList, err error) {
 	var (
 		filterParts []bson.M
 		findQuery   []bson.M
@@ -49,13 +49,12 @@ func EmployeeList(active string, name string, page int) (employeeList interface{
 
 	//Get employee list
 	employees, err := dao.EmployeeFind(findQuery)
-
-	//Paging list
-	if page > 0 {
-		employeeList, err = util.Paging(employees, page, 8)
+	if err != nil {
 		return
 	}
-	employeeList = employees
+
+	//Paging list
+	employeeList, err = util.Paging(employees, page, 8)
 
 	return
 }

@@ -151,7 +151,7 @@ func BookingFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 			serviceID                     = c.QueryParam("service_id")
 			page                          = c.QueryParam("page")
 			status                        = c.QueryParam("status")
-			p                             = 0
+			p                             = 1
 			ctmID      primitive.ObjectID = [12]byte{}
 			svcID      primitive.ObjectID = [12]byte{}
 			err        error

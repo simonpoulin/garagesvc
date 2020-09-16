@@ -46,7 +46,7 @@ func BookingDetail(id primitive.ObjectID) (booking model.Booking, err error) {
 }
 
 // BookingList ...
-func BookingList(status string, serviceID primitive.ObjectID, customerID primitive.ObjectID, page int) (bookingList interface{}, err error) {
+func BookingList(status string, serviceID primitive.ObjectID, customerID primitive.ObjectID, page int) (bookingList util.PagedList, err error) {
 	var (
 		filterParts []bson.M
 		findQuery   []bson.M
@@ -78,13 +78,12 @@ func BookingList(status string, serviceID primitive.ObjectID, customerID primiti
 
 	//Get bookings
 	bookings, err := dao.BookingFind(findQuery)
-
-	//Paging list
-	if page > 0 {
-		bookingList, err = util.Paging(bookings, page, 8)
+	if err != nil {
 		return
 	}
-	bookingList = bookings
+
+	//Paging list
+	bookingList, err = util.Paging(bookings, page, 8)
 
 	return
 }
