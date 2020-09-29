@@ -9,7 +9,7 @@ import (
 )
 
 // ServiceCreate ...
-func ServiceCreate(service model.Service) (err error) {
+func ServiceCreate(service model.ServiceCreateBSON) (err error) {
 	var (
 		serviceCol = mongodb.ServiceCol()
 		ctx        = context.Background()
@@ -19,7 +19,7 @@ func ServiceCreate(service model.Service) (err error) {
 }
 
 // ServiceFindOne ...
-func ServiceFindOne(filter interface{}) (service model.Service, err error) {
+func ServiceFindOne(filter bson.M) (service model.Service, err error) {
 	var (
 		serviceCol = mongodb.ServiceCol()
 		ctx        = context.Background()
@@ -47,7 +47,7 @@ func ServiceFind(filter []bson.M) (serviceList []model.Service, err error) {
 }
 
 // ServiceUpdateOne ...
-func ServiceUpdateOne(filter interface{}, data interface{}) (err error) {
+func ServiceUpdateOne(filter bson.M, data bson.M) (err error) {
 	var (
 		serviceCol = mongodb.ServiceCol()
 		ctx        = context.Background()
@@ -57,7 +57,7 @@ func ServiceUpdateOne(filter interface{}, data interface{}) (err error) {
 }
 
 // ServiceDelete ...
-func ServiceDelete(filter interface{}) (err error) {
+func ServiceDelete(filter bson.M) (err error) {
 	var (
 		serviceCol = mongodb.ServiceCol()
 		ctx        = context.Background()

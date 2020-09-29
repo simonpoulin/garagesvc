@@ -25,7 +25,7 @@ import (
 // @Failure 404 {object} util.Response
 //
 // @Security BearerToken
-// @Router /user/customers/{id} [get]
+// @Router /user/customers [get]
 func CustomerDetail(c echo.Context) error {
 	var (
 		customer = c.Get("authcustomer").(model.Customer)
@@ -61,7 +61,7 @@ func CustomerDetail(c echo.Context) error {
 // @Failure 404 {object} util.Response
 //
 // @Security BearerToken
-// @Router /user/customers/{id} [patch]
+// @Router /user/customers [patch]
 func CustomerUpdate(c echo.Context) error {
 	var (
 		customer = c.Get("authcustomer").(model.Customer)

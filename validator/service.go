@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"errors"
 	"garagesvc/dao"
 	"garagesvc/model"
 	"garagesvc/util"
@@ -23,32 +24,21 @@ func ServiceCreate(next echo.HandlerFunc) echo.HandlerFunc {
 		if err := c.Bind(&payload); err != nil {
 			return util.Response400(c, err.Error())
 		}
-		_, err := govalidator.ValidateStruct(payload)
 
 		//Validate struct
+		_, err := govalidator.ValidateStruct(payload)
 		if err != nil {
 			return util.Response400(c, err.Error())
 		}
-
-		//Check valid company ID
-		cpnID, err := primitive.ObjectIDFromHex(payload.CompanyID)
-		if err != nil {
-			return util.Response400(c, err.Error())
-		}
-
-		//Set filter
-		filter := bson.M{"_id": cpnID}
 
 		//Validate company
-		_, err = dao.CompanyFindOne(filter)
+		company, err := CompanyValidate(payload.CompanyID)
 		if err != nil {
 			return util.Response404(c, err.Error())
 		}
 
-		//Set IDs for payload
-		payload.CompanyObjectID = cpnID
-
 		//Set body and move to next process
+		payload.CompanyObjectID = company.ID
 		c.Set("body", payload)
 		return next(c)
 	}
@@ -91,22 +81,11 @@ func ServiceUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 func ServiceCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			id      = c.Param("id")
-			_id     primitive.ObjectID
-			service model.Service
+			id = c.Param("id")
 		)
 
-		//Bind ID
-		_id, err := primitive.ObjectIDFromHex(id)
-		if err != nil {
-			return util.Response400(c, err.Error())
-		}
-
-		//Set filter
-		filter := bson.M{"_id": _id}
-
 		//Validate service
-		service, err = dao.ServiceFindOne(filter)
+		service, err := ServiceValidate(id)
 		if err != nil {
 			return util.Response404(c, err.Error())
 		}
@@ -121,41 +100,53 @@ func ServiceCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 func ServiceFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			companyID                    = c.QueryParam("company_id")
-			page                         = c.QueryParam("page")
-			active                       = c.QueryParam("active")
-			p                            = 1
-			cpnID     primitive.ObjectID = [12]byte{}
-			err       error
+			query   model.ServiceQuery
+			company model.Company
+			err     error
 		)
 
-		//Check valid page param
-		if page != "" {
-			p, err = strconv.Atoi(page)
+		//Bind and parse to struct
+		if err = c.Bind(&query); err != nil {
+			return util.Response400(c, err.Error())
+		}
+
+		//Validate company
+		if query.CompanyID != "" {
+			company, err = CompanyValidate(query.CompanyID)
 			if err != nil {
-				return util.Response400(c, err.Error())
+				return util.Response404(c, err.Error())
 			}
 		}
 
-		//Check valid active param
-		if active != "" {
-			_, err = strconv.ParseBool(active)
-			if err != nil {
-				return util.Response400(c, err.Error())
-			}
-		}
-
-		//Check valid companyID param
-		if companyID != "" {
-			cpnID, err = primitive.ObjectIDFromHex(companyID)
-			if err != nil {
+		//Validate active param
+		if query.Active != "" {
+			if query.Active != "all" && query.Active != "active" && query.Active != "inactive" {
+				err = errors.New("invalid active query param")
 				return util.Response400(c, err.Error())
 			}
 		}
 
 		//Set body and move to next process
-		c.Set("page", p)
-		c.Set("companyID", cpnID)
+		query.CompanyObjectID = company.ID
+		c.Set("query", query)
 		return next(c)
 	}
+}
+
+// ServiceValidate ...
+func ServiceValidate(serviceID string) (service model.Service, err error) {
+
+	//Check valid service ID
+	svcID, err := primitive.ObjectIDFromHex(serviceID)
+	if err != nil {
+		return
+	}
+
+	//Set filter
+	filter := bson.M{"_id": svcID}
+
+	//Validate service
+	service, err = dao.ServiceFindOne(filter)
+
+	return
 }

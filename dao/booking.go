@@ -9,7 +9,7 @@ import (
 )
 
 // BookingCreate ...
-func BookingCreate(booking model.Booking) (err error) {
+func BookingCreate(booking model.BookingCreateBSON) (err error) {
 	var (
 		bookingCol = mongodb.BookingCol()
 		ctx        = context.Background()
@@ -19,7 +19,7 @@ func BookingCreate(booking model.Booking) (err error) {
 }
 
 // BookingFindOne ...
-func BookingFindOne(filter interface{}) (booking model.Booking, err error) {
+func BookingFindOne(filter bson.M) (booking model.Booking, err error) {
 	var (
 		bookingCol = mongodb.BookingCol()
 		ctx        = context.Background()
@@ -47,7 +47,7 @@ func BookingFind(filter []bson.M) (bookingList []model.Booking, err error) {
 }
 
 // BookingUpdateOne ...
-func BookingUpdateOne(filter interface{}, data interface{}) (err error) {
+func BookingUpdateOne(filter bson.M, data bson.M) (err error) {
 	var (
 		bookingCol = mongodb.BookingCol()
 		ctx        = context.Background()
@@ -57,7 +57,7 @@ func BookingUpdateOne(filter interface{}, data interface{}) (err error) {
 }
 
 // BookingDelete ...
-func BookingDelete(filter interface{}) (err error) {
+func BookingDelete(filter bson.M) (err error) {
 	var (
 		bookingCol = mongodb.BookingCol()
 		ctx        = context.Background()

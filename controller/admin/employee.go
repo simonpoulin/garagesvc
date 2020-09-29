@@ -62,20 +62,26 @@ func EmployeeDetail(c echo.Context) error {
 // @Failure 404 {object} util.Response
 //
 // @Security BearerToken
-// @Router /admin/employees/ [get]
+// @Router /admin/employees [get]
 func EmployeeList(c echo.Context) error {
 	var (
-		active = c.QueryParam("active")
-		name   = c.QueryParam("name")
-		page   = c.Get("page").(int)
+		queryValues = c.Get("query").(model.EmployeeQuery)
+		query       = model.AppQuery{
+			Active: queryValues.Active,
+			Name:   queryValues.Name,
+			Page:   queryValues.Page,
+		}
 	)
 
 	//Get employee list
-	result, err := service.EmployeeList(active, name, page)
+	result, err := service.EmployeeList(query)
 
-	//If error, return 404
+	//Handle errors
 	if err != nil {
-		return util.Response404(c, err.Error())
+		//If list is not empty, return 400
+		if !util.IsEmptyListError(err) {
+			return util.Response400(c, err.Error())
+		}
 	}
 
 	//Return 200

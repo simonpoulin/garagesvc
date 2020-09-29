@@ -21,23 +21,17 @@ func CustomerDetail(id primitive.ObjectID) (customer model.Customer, err error) 
 }
 
 // CustomerList ...
-func CustomerList(name string, page int) (customerList util.PagedList, err error) {
-	var (
-		filter = bson.M{}
-	)
-
-	if name != "" {
-		filter = bson.M{"name": bson.M{"$regex": name}}
-	}
+func CustomerList(query model.AppQuery) (customerList util.PagedList, err error) {
+	var findQuery = query.GenerateFindQuery()
 
 	//Get customers
-	customers, err := dao.CustomerFind(filter)
+	customers, err := dao.CustomerFind(findQuery)
 	if err != nil {
 		return
 	}
 
 	//Paging list
-	customerList, err = util.Paging(customers, page, 8)
+	customerList, err = util.Paging(customers, query.Page, 8)
 
 	return
 }
@@ -47,10 +41,7 @@ func CustomerUpdate(id primitive.ObjectID, payload model.CustomerUpdatePayload) 
 
 	//Set filter and data
 	filter := bson.M{"_id": id}
-	update := bson.M{"$set": bson.M{
-		"password": util.Hash(payload.Password),
-		"name":     payload.Name,
-	}}
+	update := bson.M{"$set": payload.ConvertToUpdateBSON()}
 
 	//Update customer
 	err = dao.CustomerUpdateOne(filter, update)

@@ -12,14 +12,10 @@ import (
 
 // EmployeeRegister ...
 func EmployeeRegister(payload model.EmployeeRegisterPayload) (employeeID primitive.ObjectID, err error) {
-	var employee model.Employee
+	var employee model.EmployeeCreateBSON
 
 	//Set data for new employee
-	employee.ID = primitive.NewObjectID()
-	employee.Active = true
-	employee.Password = util.Hash(payload.Password)
-	employee.Name = payload.Name
-	employee.Phone = payload.Phone
+	employee = payload.ConvertToCreateBSON()
 
 	//Insert to database
 	err = dao.EmployeeCreate(employee)
@@ -34,16 +30,23 @@ func EmployeeLogin(payload model.EmployeeLoginPayload) (token string, err error)
 	payload.Password = util.Hash(payload.Password)
 	filter := bson.M{"phone": payload.Phone}
 	employee, err := dao.EmployeeFindOne(filter)
+	if err != nil {
+		return
+	}
 
 	//Check password match
 	if payload.Password != employee.Password {
 		err = errors.New("password not match")
 		return
 	}
+
+	//Check if account is active
 	if !employee.Active {
 		err = errors.New("employee disabled")
 		return
 	}
+
+	//Generate token
 	token, err = employee.GenerateToken()
 	return
 }

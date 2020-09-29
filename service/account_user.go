@@ -12,13 +12,10 @@ import (
 
 // CustomerRegister ...
 func CustomerRegister(payload model.CustomerRegisterPayload) (customerID primitive.ObjectID, err error) {
-	var customer model.Customer
+	var customer model.CustomerCreateBSON
 
 	//Set data for new customer
-	customer.ID = primitive.NewObjectID()
-	customer.Password = util.Hash(payload.Password)
-	customer.Name = payload.Name
-	customer.Phone = payload.Phone
+	customer = payload.ConvertToCreateBSON()
 
 	//Insert to database
 	err = dao.CustomerCreate(customer)

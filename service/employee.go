@@ -21,31 +21,9 @@ func EmployeeDetail(id primitive.ObjectID) (employee model.Employee, err error) 
 }
 
 // EmployeeList ...
-func EmployeeList(active string, name string, page int) (employeeList util.PagedList, err error) {
-	var (
-		filterParts []bson.M
-		findQuery   []bson.M
-	)
+func EmployeeList(query model.AppQuery) (employeeList util.PagedList, err error) {
 
-	//Set filter parts
-	if active != "" {
-		stt, _ := strconv.ParseBool(active)
-		filterParts = append(filterParts, bson.M{"active": stt})
-	}
-
-	if name != "" {
-		filterParts = append(filterParts, bson.M{"name": bson.M{"$regex": name}})
-	}
-
-	//Set filter query from parts
-	findQuery = append(findQuery, bson.M{"$match": func() bson.M {
-		if filterParts != nil {
-			if len(filterParts) > 0 {
-				return bson.M{"$and": filterParts}
-			}
-		}
-		return bson.M{}
-	}()})
+	var findQuery = query.GenerateFindQuery()
 
 	//Get employee list
 	employees, err := dao.EmployeeFind(findQuery)
@@ -54,7 +32,7 @@ func EmployeeList(active string, name string, page int) (employeeList util.Paged
 	}
 
 	//Paging list
-	employeeList, err = util.Paging(employees, page, 8)
+	employeeList, err = util.Paging(employees, query.Page, 8)
 
 	return
 }
@@ -71,12 +49,7 @@ func EmployeeUpdate(id primitive.ObjectID, payload model.EmployeeUpdatePayload, 
 		stt, _ := strconv.ParseBool(active)
 		update = bson.M{"$set": bson.M{"active": stt}}
 	} else {
-		update = bson.M{"$set": bson.M{
-			"active":   payload.Active,
-			"password": util.Hash(payload.Password),
-			"name":     payload.Name,
-			"phone":    payload.Phone,
-		}}
+		update = bson.M{"$set": payload.ConvertToUpdateBSON()}
 	}
 
 	//Update employee

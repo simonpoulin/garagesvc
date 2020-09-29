@@ -25,7 +25,7 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/admin/bookings/": {
+        "/admin/bookings": {
             "get": {
                 "security": [
                     {
@@ -322,7 +322,7 @@ var doc = `{
                 }
             }
         },
-        "/admin/companies/": {
+        "/admin/companies": {
             "get": {
                 "security": [
                     {
@@ -357,6 +357,12 @@ var doc = `{
                         "type": "integer",
                         "description": "Page number",
                         "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Phone number",
+                        "name": "phone",
                         "in": "query"
                     }
                 ],
@@ -620,7 +626,7 @@ var doc = `{
                 }
             }
         },
-        "/admin/customers/": {
+        "/admin/customers": {
             "get": {
                 "security": [
                     {
@@ -850,7 +856,7 @@ var doc = `{
                 }
             }
         },
-        "/admin/employees/": {
+        "/admin/employees": {
             "get": {
                 "security": [
                     {
@@ -1091,7 +1097,7 @@ var doc = `{
                 }
             }
         },
-        "/admin/services/": {
+        "/admin/services": {
             "get": {
                 "security": [
                     {
@@ -1132,6 +1138,12 @@ var doc = `{
                         "type": "integer",
                         "description": "Page number",
                         "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Phone number",
+                        "name": "phone",
                         "in": "query"
                     }
                 ],
@@ -1601,7 +1613,7 @@ var doc = `{
                 }
             }
         },
-        "/user/bookings/": {
+        "/user/bookings": {
             "get": {
                 "security": [
                     {
@@ -1898,7 +1910,7 @@ var doc = `{
                 }
             }
         },
-        "/user/companies/": {
+        "/user/companies": {
             "get": {
                 "security": [
                     {
@@ -2019,7 +2031,7 @@ var doc = `{
                 }
             }
         },
-        "/user/customers/{id}": {
+        "/user/customers": {
             "get": {
                 "security": [
                     {
@@ -2136,7 +2148,7 @@ var doc = `{
                 }
             }
         },
-        "/user/services/": {
+        "/user/services": {
             "get": {
                 "security": [
                     {
@@ -2311,11 +2323,17 @@ var doc = `{
                 "address": {
                     "type": "string"
                 },
+                "email": {
+                    "type": "string"
+                },
                 "location": {
                     "type": "object",
                     "$ref": "#/definitions/model.Location"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "phone": {
                     "type": "string"
                 }
             }
@@ -2329,12 +2347,32 @@ var doc = `{
                 "address": {
                     "type": "string"
                 },
+                "email": {
+                    "type": "string"
+                },
                 "location": {
                     "type": "object",
                     "$ref": "#/definitions/model.Location"
                 },
                 "name": {
                     "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Coordinates": {
+            "type": "object",
+            "properties": {
+                "acc": {
+                    "type": "integer"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "lng": {
+                    "type": "number"
                 }
             }
         },
@@ -2417,7 +2455,16 @@ var doc = `{
             }
         },
         "model.Location": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "coordinates": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Coordinates"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
         },
         "model.ServiceCreatePayload": {
             "type": "object",
@@ -2431,11 +2478,20 @@ var doc = `{
                 "companyid": {
                     "type": "string"
                 },
+                "desc": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
                 "location": {
                     "type": "object",
                     "$ref": "#/definitions/model.Location"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "phone": {
                     "type": "string"
                 }
             }
@@ -2449,11 +2505,20 @@ var doc = `{
                 "address": {
                     "type": "string"
                 },
+                "desc": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
                 "location": {
                     "type": "object",
                     "$ref": "#/definitions/model.Location"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "phone": {
                     "type": "string"
                 }
             }

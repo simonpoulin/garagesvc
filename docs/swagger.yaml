@@ -30,10 +30,14 @@ definitions:
     properties:
       address:
         type: string
+      email:
+        type: string
       location:
         $ref: '#/definitions/model.Location'
         type: object
       name:
+        type: string
+      phone:
         type: string
     type: object
   model.CompanyUpdatePayload:
@@ -42,11 +46,24 @@ definitions:
         type: boolean
       address:
         type: string
+      email:
+        type: string
       location:
         $ref: '#/definitions/model.Location'
         type: object
       name:
         type: string
+      phone:
+        type: string
+    type: object
+  model.Coordinates:
+    properties:
+      acc:
+        type: integer
+      lat:
+        type: number
+      lng:
+        type: number
     type: object
   model.CustomerLoginPayload:
     properties:
@@ -99,6 +116,12 @@ definitions:
         type: string
     type: object
   model.Location:
+    properties:
+      coordinates:
+        $ref: '#/definitions/model.Coordinates'
+        type: object
+      type:
+        type: string
     type: object
   model.ServiceCreatePayload:
     properties:
@@ -108,10 +131,16 @@ definitions:
         type: string
       companyid:
         type: string
+      desc:
+        type: string
+      email:
+        type: string
       location:
         $ref: '#/definitions/model.Location'
         type: object
       name:
+        type: string
+      phone:
         type: string
     type: object
   model.ServiceUpdatePayload:
@@ -120,10 +149,16 @@ definitions:
         type: boolean
       address:
         type: string
+      desc:
+        type: string
+      email:
+        type: string
       location:
         $ref: '#/definitions/model.Location'
         type: object
       name:
+        type: string
+      phone:
         type: string
     type: object
   util.Response:
@@ -141,7 +176,7 @@ info:
   title: Garage Service API
   version: 1.0.0
 paths:
-  /admin/bookings/:
+  /admin/bookings:
     get:
       consumes:
       - application/json
@@ -331,7 +366,7 @@ paths:
       summary: Admin API - Booking update
       tags:
       - Admin - Bookings
-  /admin/companies/:
+  /admin/companies:
     get:
       consumes:
       - application/json
@@ -349,6 +384,10 @@ paths:
         in: query
         name: page
         type: integer
+      - description: Phone number
+        in: query
+        name: phone
+        type: string
       produces:
       - application/json
       responses:
@@ -521,7 +560,7 @@ paths:
       summary: Admin API - Company delete
       tags:
       - Admin - Companies
-  /admin/customers/:
+  /admin/customers:
     get:
       consumes:
       - application/json
@@ -668,7 +707,7 @@ paths:
       summary: Admin API - Customer update
       tags:
       - Admin - Customers
-  /admin/employees/:
+  /admin/employees:
     get:
       consumes:
       - application/json
@@ -822,7 +861,7 @@ paths:
       summary: Admin API - Employee update
       tags:
       - Admin - Employees
-  /admin/services/:
+  /admin/services:
     get:
       consumes:
       - application/json
@@ -844,6 +883,10 @@ paths:
         in: query
         name: page
         type: integer
+      - description: Phone number
+        in: query
+        name: phone
+        type: string
       produces:
       - application/json
       responses:
@@ -1151,7 +1194,7 @@ paths:
       summary: Admin API - Employee Register
       tags:
       - Common
-  /user/bookings/:
+  /user/bookings:
     get:
       consumes:
       - application/json
@@ -1341,7 +1384,7 @@ paths:
       summary: User API - Booking update
       tags:
       - User - Bookings
-  /user/companies/:
+  /user/companies:
     get:
       consumes:
       - application/json
@@ -1418,7 +1461,7 @@ paths:
       summary: User API - Company detail
       tags:
       - User - Companies
-  /user/customers/{id}:
+  /user/customers:
     get:
       consumes:
       - application/json
@@ -1493,7 +1536,7 @@ paths:
       summary: User API - Customer update
       tags:
       - User - Customers
-  /user/services/:
+  /user/services:
     get:
       consumes:
       - application/json

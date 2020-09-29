@@ -6,7 +6,6 @@ import (
 	"garagesvc/util"
 
 	"github.com/labstack/echo/v4"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // ServiceCreate godoc
@@ -26,7 +25,7 @@ import (
 // @Failure 404 {object} util.Response
 //
 // @Security BearerToken
-// @Router /admin/services/ [post]
+// @Router /admin/services [post]
 func ServiceCreate(c echo.Context) error {
 	var (
 		payload = c.Get("body").(model.ServiceCreatePayload)
@@ -92,6 +91,7 @@ func ServiceDetail(c echo.Context) error {
 // @Param companyid query string false "Company's ID"
 // @Param active query string false "Active state"
 // @Param page query int false "Page number"
+// @Param phone query string false "Phone number"
 //
 // @Success 200 {object} util.Response
 // @Failure 400 {object} util.Response
@@ -99,21 +99,27 @@ func ServiceDetail(c echo.Context) error {
 // @Failure 404 {object} util.Response
 //
 // @Security BearerToken
-// @Router /admin/services/ [get]
+// @Router /admin/services [get]
 func ServiceList(c echo.Context) error {
 	var (
-		active    = c.QueryParam("active")
-		name      = c.QueryParam("name")
-		companyID = c.Get("companyID").(primitive.ObjectID)
-		page      = c.Get("page").(int)
+		queryValues = c.Get("query").(model.ServiceQuery)
+		query       = model.AppQuery{
+			Name:      queryValues.Name,
+			Page:      queryValues.Page,
+			CompanyID: queryValues.CompanyObjectID,
+			Active:    queryValues.Active,
+		}
 	)
 
 	//Get service list
-	result, err := service.ServiceList(active, name, companyID, page)
+	result, err := service.ServiceList(query)
 
-	//If error, return 404
+	//Handle errors
 	if err != nil {
-		return util.Response404(c, err.Error())
+		//If list is not empty, return 400
+		if !util.IsEmptyListError(err) {
+			return util.Response400(c, err.Error())
+		}
 	}
 
 	//Return 200

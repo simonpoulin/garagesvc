@@ -10,7 +10,7 @@
     "host": "micasvn.ddns.net:9999",
     "basePath": "/",
     "paths": {
-        "/admin/bookings/": {
+        "/admin/bookings": {
             "get": {
                 "security": [
                     {
@@ -307,7 +307,7 @@
                 }
             }
         },
-        "/admin/companies/": {
+        "/admin/companies": {
             "get": {
                 "security": [
                     {
@@ -342,6 +342,12 @@
                         "type": "integer",
                         "description": "Page number",
                         "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Phone number",
+                        "name": "phone",
                         "in": "query"
                     }
                 ],
@@ -605,7 +611,7 @@
                 }
             }
         },
-        "/admin/customers/": {
+        "/admin/customers": {
             "get": {
                 "security": [
                     {
@@ -835,7 +841,7 @@
                 }
             }
         },
-        "/admin/employees/": {
+        "/admin/employees": {
             "get": {
                 "security": [
                     {
@@ -1076,7 +1082,7 @@
                 }
             }
         },
-        "/admin/services/": {
+        "/admin/services": {
             "get": {
                 "security": [
                     {
@@ -1117,6 +1123,12 @@
                         "type": "integer",
                         "description": "Page number",
                         "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Phone number",
+                        "name": "phone",
                         "in": "query"
                     }
                 ],
@@ -1586,7 +1598,7 @@
                 }
             }
         },
-        "/user/bookings/": {
+        "/user/bookings": {
             "get": {
                 "security": [
                     {
@@ -1883,7 +1895,7 @@
                 }
             }
         },
-        "/user/companies/": {
+        "/user/companies": {
             "get": {
                 "security": [
                     {
@@ -2004,7 +2016,7 @@
                 }
             }
         },
-        "/user/customers/{id}": {
+        "/user/customers": {
             "get": {
                 "security": [
                     {
@@ -2121,7 +2133,7 @@
                 }
             }
         },
-        "/user/services/": {
+        "/user/services": {
             "get": {
                 "security": [
                     {
@@ -2296,11 +2308,17 @@
                 "address": {
                     "type": "string"
                 },
+                "email": {
+                    "type": "string"
+                },
                 "location": {
                     "type": "object",
                     "$ref": "#/definitions/model.Location"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "phone": {
                     "type": "string"
                 }
             }
@@ -2314,12 +2332,32 @@
                 "address": {
                     "type": "string"
                 },
+                "email": {
+                    "type": "string"
+                },
                 "location": {
                     "type": "object",
                     "$ref": "#/definitions/model.Location"
                 },
                 "name": {
                     "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Coordinates": {
+            "type": "object",
+            "properties": {
+                "acc": {
+                    "type": "integer"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "lng": {
+                    "type": "number"
                 }
             }
         },
@@ -2402,7 +2440,16 @@
             }
         },
         "model.Location": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "coordinates": {
+                    "type": "object",
+                    "$ref": "#/definitions/model.Coordinates"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
         },
         "model.ServiceCreatePayload": {
             "type": "object",
@@ -2416,11 +2463,20 @@
                 "companyid": {
                     "type": "string"
                 },
+                "desc": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
                 "location": {
                     "type": "object",
                     "$ref": "#/definitions/model.Location"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "phone": {
                     "type": "string"
                 }
             }
@@ -2434,11 +2490,20 @@
                 "address": {
                     "type": "string"
                 },
+                "desc": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
                 "location": {
                     "type": "object",
                     "$ref": "#/definitions/model.Location"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "phone": {
                     "type": "string"
                 }
             }

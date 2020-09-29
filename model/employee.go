@@ -16,30 +16,65 @@ type Employee struct {
 	Active   bool               `json:"active" bson:"active"`
 }
 
-// EmployeeLoginPayload ...
-type EmployeeLoginPayload struct {
-	Phone    string `json:"phone" bson:"phone" valid:"required, type(string), stringlength(10|10)"`
-	Password string `json:"password" bson:"password" valid:"required, type(string), stringlength(6|20)"`
+// EmployeeCreateBSON ...
+type EmployeeCreateBSON struct {
+	ID           primitive.ObjectID `bson:"_id"`
+	Name         string             `bson:"name"`
+	Phone        string             `bson:"phone"`
+	Password     string             `bson:"password"`
+	Active       bool               `bson:"active"`
+	SearchString string             `bson:"searchstring"`
 }
 
-// EmployeeRegisterPayload ...
-type EmployeeRegisterPayload struct {
-	Name     string `json:"name" bson:"name" valid:"required, stringlength(1|20)"`
-	Phone    string `json:"phone" bson:"phone" valid:"required, type(string), stringlength(10|10)"`
-	Password string `json:"password" bson:"password" valid:"required, type(string), stringlength(6|20)"`
+// EmployeeUpdateBSON ...
+type EmployeeUpdateBSON struct {
+	Name         string `bson:"name"`
+	Phone        string `bson:"phone"`
+	Password     string `bson:"password"`
+	Active       bool   `bson:"active"`
+	SearchString string `bson:"searchstring"`
 }
 
-// EmployeeUpdatePayload ...
-type EmployeeUpdatePayload struct {
-	Name     string `json:"name" bson:"name" valid:"required, stringlength(1|20)"`
-	Phone    string `json:"phone" bson:"phone" valid:"required, type(string), stringlength(10|10)"`
-	Password string `json:"password" bson:"password" valid:"required, type(string), stringlength(6|20)"`
-	Active   bool   `json:"active" bson:"active" valid:"required, type(bool)"`
+// ConvertToCreateBSON ...
+func (payload EmployeeRegisterPayload) ConvertToCreateBSON() (employeeBSON EmployeeCreateBSON) {
+	employeeBSON = EmployeeCreateBSON{
+		ID:           primitive.NewObjectID(),
+		Name:         payload.Name,
+		Phone:        payload.Phone,
+		Password:     util.Hash(payload.Password),
+		SearchString: util.ConvertToHex(payload.Name),
+		Active:       true,
+	}
+	return
+}
+
+// ConvertToUpdateBSON ...
+func (payload EmployeeUpdatePayload) ConvertToUpdateBSON() (employeeBSON EmployeeUpdateBSON) {
+	employeeBSON = EmployeeUpdateBSON{
+		Name:         payload.Name,
+		Phone:        payload.Phone,
+		Password:     util.Hash(payload.Password),
+		Active:       payload.Active,
+		SearchString: util.ConvertToHex(payload.Name),
+	}
+	return
 }
 
 // GenerateToken ...
 func (e Employee) GenerateToken() (token string, err error) {
 	env := config.GetENV()
 	token, err = util.TokenEncode(e.ID.Hex(), env.EmployeeKey)
+	return
+}
+
+// ConvertToUpdateSearchStringBSON ...
+func (e Employee) ConvertToUpdateSearchStringBSON() (employeeBSON EmployeeUpdateBSON) {
+	employeeBSON = EmployeeUpdateBSON{
+		Name:         e.Name,
+		Phone:        e.Phone,
+		Password:     util.Hash(e.Password),
+		Active:       e.Active,
+		SearchString: util.ConvertToHex(e.Name),
+	}
 	return
 }

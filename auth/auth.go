@@ -3,12 +3,9 @@ package auth
 import (
 	"errors"
 	"garagesvc/config"
-	"garagesvc/dao"
 	"garagesvc/util"
+	"garagesvc/validator"
 	"strings"
-
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
@@ -52,15 +49,8 @@ func LoggedInAsCustomer(next echo.HandlerFunc) echo.HandlerFunc {
 			return util.Response401(c, "Invalid token")
 		}
 
-		//Set filter
-		customerID, err := primitive.ObjectIDFromHex(userClaim.ID)
-		if err != nil {
-			return util.Response401(c, err.Error())
-		}
-		filter := bson.M{"_id": customerID}
-
-		//Verify customer by ID
-		customer, err := dao.CustomerFindOne(filter)
+		//Validate customer
+		customer, err := validator.CustomerValidate(userClaim.ID)
 		if err != nil {
 			return util.Response401(c, err.Error())
 		}
@@ -108,19 +98,12 @@ func LoggedInAsEmployee(next echo.HandlerFunc) echo.HandlerFunc {
 		if !ok || !token.Valid {
 			return util.Response401(c, "Invalid token")
 		}
-		//Set filter
-		employeeID, err := primitive.ObjectIDFromHex(userClaim.ID)
+
+		//Validate employee
+		employee, err := validator.EmployeeValidate(userClaim.ID)
 		if err != nil {
 			return util.Response401(c, err.Error())
 		}
-		filter := bson.M{"_id": employeeID}
-
-		//Verify employee by ID
-		employee, err := dao.EmployeeFindOne(filter)
-		if err != nil {
-			return util.Response401(c, err.Error())
-		}
-
 		//Set body and move to next process
 		c.Set("authemployee", employee)
 		return next(c)

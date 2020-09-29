@@ -12,14 +12,10 @@ import (
 
 // CompanyCreate ...
 func CompanyCreate(payload model.CompanyCreatePayload) (companyID primitive.ObjectID, err error) {
-	var company model.Company
+	var company model.CompanyCreateBSON
 
 	//Set data for new company
-	company.ID = primitive.NewObjectID()
-	company.Active = false
-	company.Address = payload.Address
-	company.Name = payload.Name
-	company.Location = payload.Location
+	company = payload.ConvertToCreateBSON()
 
 	//Insert to database
 	err = dao.CompanyCreate(company)
@@ -39,30 +35,9 @@ func CompanyDetail(id primitive.ObjectID) (company model.Company, err error) {
 }
 
 // CompanyList ...
-func CompanyList(name string, page int, active string) (companyList util.PagedList, err error) {
-	var (
-		filterParts []bson.M
-		findQuery   []bson.M
-	)
-	//Set filter parts
-	if active != "" {
-		stt, _ := strconv.ParseBool(active)
-		filterParts = append(filterParts, bson.M{"active": stt})
-	}
+func CompanyList(query model.AppQuery) (companyList util.PagedList, err error) {
 
-	if name != "" {
-		filterParts = append(filterParts, bson.M{"name": bson.M{"$regex": name}})
-	}
-
-	//Set filter query from parts
-	findQuery = append(findQuery, bson.M{"$match": func() bson.M {
-		if filterParts != nil {
-			if len(filterParts) > 0 {
-				return bson.M{"$and": filterParts}
-			}
-		}
-		return bson.M{}
-	}()})
+	var findQuery = query.GenerateFindQuery()
 
 	//Get companies
 	companies, err := dao.CompanyFind(findQuery)
@@ -71,7 +46,7 @@ func CompanyList(name string, page int, active string) (companyList util.PagedLi
 	}
 
 	//Paging list
-	companyList, err = util.Paging(companies, page, 8)
+	companyList, err = util.Paging(companies, query.Page, 8)
 
 	return
 }
@@ -79,7 +54,10 @@ func CompanyList(name string, page int, active string) (companyList util.PagedLi
 // CompanyUpdate ...
 func CompanyUpdate(id primitive.ObjectID, payload model.CompanyUpdatePayload, active string) (companyID primitive.ObjectID, err error) {
 
-	var update bson.M
+	var (
+		companyData model.CompanyUpdateBSON
+		update      bson.M
+	)
 
 	//Set filter and data
 	filter := bson.M{"_id": id}
@@ -88,12 +66,8 @@ func CompanyUpdate(id primitive.ObjectID, payload model.CompanyUpdatePayload, ac
 		stt, _ := strconv.ParseBool(active)
 		update = bson.M{"$set": bson.M{"active": stt}}
 	} else {
-		update = bson.M{"$set": bson.M{
-			"active":   payload.Active,
-			"address":  payload.Address,
-			"name":     payload.Name,
-			"location": payload.Location,
-		}}
+		companyData = payload.ConvertToUpdateBSON()
+		update = bson.M{"$set": companyData}
 	}
 
 	//Update company

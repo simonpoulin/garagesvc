@@ -17,20 +17,44 @@ type Booking struct {
 	Note       string             `json:"note" bson:"note"`
 }
 
-// BookingCreatePayload ...
-type BookingCreatePayload struct {
-	CustomerID       string    `json:"customerid" bson:"customerid" valid:"required, stringlength(24|24)"`
-	ServiceID        string    `json:"serviceid" bson:"serviceid" valid:"required, stringlength(24|24)"`
-	Date             time.Time `json:"time" bson:"time"`
-	Note             string    `json:"note" bson:"note" valid:"stringlength(0|500)"`
-	CustomerObjectID primitive.ObjectID
-	ServiceObjectID  primitive.ObjectID
+// BookingCreateBSON ...
+type BookingCreateBSON struct {
+	ID         primitive.ObjectID `bson:"_id"`
+	CustomerID primitive.ObjectID `bson:"customerid"`
+	ServiceID  primitive.ObjectID `bson:"serviceid"`
+	Status     string             `bson:"status"`
+	Date       time.Time          `bson:"time"`
+	CreatedAt  time.Time          `bson:"createdAt"`
+	Note       string             `bson:"note"`
 }
 
-// BookingUpdatePayload ...
-type BookingUpdatePayload struct {
-	ServiceID       string    `json:"serviceid" bson:"serviceid" valid:"required, stringlength(24|24)"`
-	Date            time.Time `json:"time" bson:"time"`
-	Note            string    `json:"note" bson:"note" valid:"stringlength(0|500)"`
-	ServiceObjectID primitive.ObjectID
+// BookingUpdateBSON ...
+type BookingUpdateBSON struct {
+	ServiceID primitive.ObjectID `bson:"serviceid"`
+	Date      time.Time          `bson:"time"`
+	Note      string             `bson:"note"`
+}
+
+// ConvertToCreateBSON ...
+func (payload BookingCreatePayload) ConvertToCreateBSON() (bookingBSON BookingCreateBSON) {
+	bookingBSON = BookingCreateBSON{
+		ID:         primitive.NewObjectID(),
+		CustomerID: payload.CustomerObjectID,
+		ServiceID:  payload.ServiceObjectID,
+		Status:     "Pending",
+		Date:       payload.Date,
+		CreatedAt:  time.Now(),
+		Note:       payload.Note,
+	}
+	return
+}
+
+// ConvertToUpdateBSON ...
+func (payload BookingUpdatePayload) ConvertToUpdateBSON() (bookingBSON BookingUpdateBSON) {
+	bookingBSON = BookingUpdateBSON{
+		ServiceID: payload.ServiceObjectID,
+		Date:      payload.Date,
+		Note:      payload.Note,
+	}
+	return
 }

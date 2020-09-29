@@ -25,7 +25,7 @@ import (
 // @Failure 404 {object} util.Response
 //
 // @Security BearerToken
-// @Router /admin/companies/ [post]
+// @Router /admin/companies [post]
 func CompanyCreate(c echo.Context) error {
 	var (
 		payload = c.Get("body").(model.CompanyCreatePayload)
@@ -90,6 +90,7 @@ func CompanyDetail(c echo.Context) error {
 // @Param name query string false "Name keyword"
 // @Param active query string false "Active state"
 // @Param page query int false "Page number"
+// @Param phone query string false "Phone number"
 //
 // @Success 200 {object} util.Response
 // @Failure 400 {object} util.Response
@@ -97,20 +98,28 @@ func CompanyDetail(c echo.Context) error {
 // @Failure 404 {object} util.Response
 //
 // @Security BearerToken
-// @Router /admin/companies/ [get]
+// @Router /admin/companies [get]
 func CompanyList(c echo.Context) error {
 	var (
-		name   = c.QueryParam("name")
-		active = c.QueryParam("active")
-		page   = c.Get("page").(int)
+		queryValues = c.Get("query").(model.CompanyQuery)
+		query       = model.AppQuery{
+			Name:   queryValues.Name,
+			Page:   queryValues.Page,
+			Active: queryValues.Active,
+			Phone:  queryValues.Phone,
+		}
 	)
 
 	//Get company list
-	result, err := service.CompanyList(name, page, active)
+	result, err := service.CompanyList(query)
 
-	//If error, return 404
+	//Handle errors
 	if err != nil {
-		return util.Response404(c, err.Error())
+		//If list is not empty, return 400
+
+		if !util.IsEmptyListError(err) {
+			return util.Response400(c, err.Error())
+		}
 	}
 
 	//Return 200

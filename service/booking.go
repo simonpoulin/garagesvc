@@ -4,29 +4,18 @@ import (
 	"garagesvc/dao"
 	"garagesvc/model"
 	"garagesvc/util"
-	"strconv"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // BookingCreate ...
-func BookingCreate(payload model.BookingCreatePayload, customerID interface{}) (bookingID string, err error) {
-	var booking model.Booking
+func BookingCreate(payload model.BookingCreatePayload, customerID primitive.ObjectID) (bookingID string, err error) {
+
+	var booking model.BookingCreateBSON
 
 	//Set data for new booking
-	if customerID != nil {
-		booking.CustomerID = customerID.(primitive.ObjectID)
-	} else {
-		booking.CustomerID = payload.CustomerObjectID
-	}
-	booking.ServiceID = payload.ServiceObjectID
-	booking.ID = primitive.NewObjectID()
-	booking.Status = "Pending"
-	booking.Date = payload.Date
-	booking.Note = payload.Note
-	booking.CreatedAt = time.Now()
+	booking = payload.ConvertToCreateBSON()
 
 	//Insert to database
 	err = dao.BookingCreate(booking)
@@ -46,35 +35,8 @@ func BookingDetail(id primitive.ObjectID) (booking model.Booking, err error) {
 }
 
 // BookingList ...
-func BookingList(status string, serviceID primitive.ObjectID, customerID primitive.ObjectID, page int) (bookingList util.PagedList, err error) {
-	var (
-		filterParts []bson.M
-		findQuery   []bson.M
-	)
-
-	//Set filter parts
-	if status != "" {
-		stt, _ := strconv.ParseBool(status)
-		filterParts = append(filterParts, bson.M{"status": stt})
-	}
-
-	if serviceID.Hex() != "000000000000000000000000" {
-		filterParts = append(filterParts, bson.M{"serviceid": serviceID})
-	}
-
-	if customerID.Hex() != "000000000000000000000000" {
-		filterParts = append(filterParts, bson.M{"customerid": customerID})
-	}
-
-	//Set filter query from parts
-	findQuery = append(findQuery, bson.M{"$match": func() bson.M {
-		if filterParts != nil {
-			if len(filterParts) > 0 {
-				return bson.M{"$and": filterParts}
-			}
-		}
-		return bson.M{}
-	}()})
+func BookingList(query model.AppQuery) (bookingList util.PagedList, err error) {
+	var findQuery = query.GenerateFindQuery()
 
 	//Get bookings
 	bookings, err := dao.BookingFind(findQuery)
@@ -83,7 +45,7 @@ func BookingList(status string, serviceID primitive.ObjectID, customerID primiti
 	}
 
 	//Paging list
-	bookingList, err = util.Paging(bookings, page, 8)
+	bookingList, err = util.Paging(bookings, query.Page, 8)
 
 	return
 }
@@ -93,11 +55,7 @@ func BookingUpdate(id primitive.ObjectID, payload model.BookingUpdatePayload) (b
 
 	//Set filter and data
 	filter := bson.M{"_id": id}
-	data := bson.M{"$set": bson.M{
-		"serviceid": payload.ServiceObjectID,
-		"date":      payload.Date,
-		"note":      payload.Note,
-	}}
+	data := bson.M{"$set": payload.ConvertToUpdateBSON}
 
 	//Update booking
 	err = dao.BookingUpdateOne(filter, data)

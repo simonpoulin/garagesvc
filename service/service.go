@@ -12,15 +12,10 @@ import (
 
 // ServiceCreate ...
 func ServiceCreate(payload model.ServiceCreatePayload) (serviceID primitive.ObjectID, err error) {
-	var service model.Service
+	var service model.ServiceCreateBSON
 
 	//Set data for new service
-	service.CompanyID = payload.CompanyObjectID
-	service.ID = primitive.NewObjectID()
-	service.Location = payload.Location
-	service.Active = false
-	service.Address = payload.Address
-	service.Name = payload.Name
+	service = payload.ConvertToCreateBSON()
 
 	//Insert to database
 	err = dao.ServiceCreate(service)
@@ -40,34 +35,8 @@ func ServiceDetail(id primitive.ObjectID) (service model.Service, err error) {
 }
 
 // ServiceList ...
-func ServiceList(active string, name string, companyID primitive.ObjectID, page int) (serviceList util.PagedList, err error) {
-	var (
-		filterParts []bson.M
-		findQuery   []bson.M
-	)
-
-	//Filter parts
-	if active != "" {
-		filterParts = append(filterParts, bson.M{"active": active})
-	}
-
-	if name != "" {
-		filterParts = append(filterParts, bson.M{"name": bson.M{"$regex": name}})
-	}
-
-	if companyID.Hex() != "000000000000000000000000" {
-		filterParts = append(filterParts, bson.M{"companyid": companyID})
-	}
-
-	//Getting filter query
-	findQuery = append(findQuery, bson.M{"$match": func() bson.M {
-		if filterParts != nil {
-			if len(filterParts) > 0 {
-				return bson.M{"$and": filterParts}
-			}
-		}
-		return bson.M{}
-	}()})
+func ServiceList(query model.AppQuery) (serviceList util.PagedList, err error) {
+	var findQuery = query.GenerateFindQuery()
 
 	//Get services
 	services, err := dao.ServiceFind(findQuery)
@@ -76,7 +45,7 @@ func ServiceList(active string, name string, companyID primitive.ObjectID, page 
 	}
 
 	//Paging list
-	serviceList, err = util.Paging(services, page, 8)
+	serviceList, err = util.Paging(services, query.Page, 8)
 
 	return
 }
@@ -93,12 +62,7 @@ func ServiceUpdate(id primitive.ObjectID, payload model.ServiceUpdatePayload, ac
 		stt, _ := strconv.ParseBool(active)
 		update = bson.M{"$set": bson.M{"active": stt}}
 	} else {
-		update = bson.M{"$set": bson.M{
-			"active":   payload.Active,
-			"address":  payload.Address,
-			"name":     payload.Name,
-			"location": payload.Location,
-		}}
+		update = bson.M{"$set": payload.ConvertToUpdateBSON}
 	}
 
 	//Update service

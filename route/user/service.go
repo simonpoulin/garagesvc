@@ -11,5 +11,5 @@ func userService(g *echo.Group) {
 	group := g.Group("/services")
 
 	group.GET("/:id", controller.ServiceDetail, validator.ServiceCheckExistance)
-	group.GET("/", controller.ServiceList, validator.ServiceFindRequest)
+	group.GET("", controller.ServiceList, validator.ServiceFindRequest)
 }

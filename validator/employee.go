@@ -24,9 +24,9 @@ func EmployeeRegister(next echo.HandlerFunc) echo.HandlerFunc {
 		if err := c.Bind(&payload); err != nil {
 			return util.Response400(c, err.Error())
 		}
-		_, err := govalidator.ValidateStruct(payload)
 
 		//Validate struct
+		_, err := govalidator.ValidateStruct(payload)
 		if err != nil {
 			return util.Response400(c, err.Error())
 		}
@@ -38,7 +38,7 @@ func EmployeeRegister(next echo.HandlerFunc) echo.HandlerFunc {
 		//Looking for customer from database
 		_, err = dao.EmployeeFindOne(filter)
 		if err != nil {
-			if err.Error() != "mongo: no documents in result" {
+			if !util.IsEmptyListError(err) {
 				return util.Response400(c, err.Error())
 			}
 		} else {
@@ -113,22 +113,11 @@ func EmployeeUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 func EmployeeCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			id       = c.Param("id")
-			_id      primitive.ObjectID
-			employee model.Employee
+			id = c.Param("id")
 		)
 
-		//Bind ID
-		_id, err := primitive.ObjectIDFromHex(id)
-		if err != nil {
-			return util.Response400(c, err.Error())
-		}
-
-		//Set filter
-		filter := bson.M{"_id": _id}
-
 		//Validate employee
-		employee, err = dao.EmployeeFindOne(filter)
+		employee, err := EmployeeValidate(id)
 		if err != nil {
 			return util.Response404(c, err.Error())
 		}
@@ -143,30 +132,43 @@ func EmployeeCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 func EmployeeFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			page   = c.QueryParam("page")
-			active = c.QueryParam("active")
-			p      = 1
-			err    error
+			query model.EmployeeQuery
+			err   error
 		)
 
-		//Check valid page param
-		if page != "" {
-			p, err = strconv.Atoi(page)
-			if err != nil {
-				return util.Response400(c, err.Error())
-			}
+		//Bind and parse to struct
+		if err := c.Bind(&query); err != nil {
+			return util.Response400(c, err.Error())
 		}
 
-		//Check valid active param
-		if active != "" {
-			_, err = strconv.ParseBool(active)
-			if err != nil {
+		//Validate active param
+		if query.Active != "" {
+			if query.Active != "all" && query.Active != "active" && query.Active != "inactive" {
+				err = errors.New("invalid active query param")
 				return util.Response400(c, err.Error())
 			}
 		}
 
 		//Set body and move to next process
-		c.Set("page", p)
+		c.Set("query", query)
 		return next(c)
 	}
+}
+
+// EmployeeValidate ...
+func EmployeeValidate(employeeID string) (employee model.Employee, err error) {
+
+	//Check valid employee ID
+	empID, err := primitive.ObjectIDFromHex(employeeID)
+	if err != nil {
+		return
+	}
+
+	//Set filter
+	filter := bson.M{"_id": empID}
+
+	//Validate employee
+	employee, err = dao.EmployeeFindOne(filter)
+
+	return
 }

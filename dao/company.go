@@ -9,7 +9,7 @@ import (
 )
 
 // CompanyCreate ...
-func CompanyCreate(company model.Company) (err error) {
+func CompanyCreate(company model.CompanyCreateBSON) (err error) {
 	var (
 		companyCol = mongodb.CompanyCol()
 		ctx        = context.Background()
@@ -19,7 +19,7 @@ func CompanyCreate(company model.Company) (err error) {
 }
 
 // CompanyFindOne ...
-func CompanyFindOne(filter interface{}) (company model.Company, err error) {
+func CompanyFindOne(filter bson.M) (company model.Company, err error) {
 	var (
 		companyCol = mongodb.CompanyCol()
 		ctx        = context.Background()
@@ -34,7 +34,7 @@ func CompanyFind(filter []bson.M) (companyList []model.Company, err error) {
 		companyCol = mongodb.CompanyCol()
 		ctx        = context.Background()
 	)
-	// Looking for companys
+	// Looking for companies
 	cur, err := companyCol.Aggregate(ctx, filter)
 	if err != nil {
 		return
@@ -47,7 +47,7 @@ func CompanyFind(filter []bson.M) (companyList []model.Company, err error) {
 }
 
 // CompanyUpdateOne ...
-func CompanyUpdateOne(filter interface{}, data interface{}) (err error) {
+func CompanyUpdateOne(filter bson.M, data bson.M) (err error) {
 	var (
 		companyCol = mongodb.CompanyCol()
 		ctx        = context.Background()
@@ -57,7 +57,7 @@ func CompanyUpdateOne(filter interface{}, data interface{}) (err error) {
 }
 
 // CompanyDelete ...
-func CompanyDelete(filter interface{}) (err error) {
+func CompanyDelete(filter bson.M) (err error) {
 	var (
 		companyCol = mongodb.CompanyCol()
 		ctx        = context.Background()

@@ -5,7 +5,6 @@ import (
 	"garagesvc/dao"
 	"garagesvc/model"
 	"garagesvc/util"
-	"strconv"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo/v4"
@@ -18,6 +17,7 @@ func BookingCreate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
 			payload model.BookingCreatePayload
+			err     error
 		)
 
 		//Bind and parse to struct
@@ -26,46 +26,26 @@ func BookingCreate(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		//Validate struct
-		_, err := govalidator.ValidateStruct(payload)
+		_, err = govalidator.ValidateStruct(payload)
 		if err != nil {
 			return util.Response400(c, err.Error())
 		}
-
-		//Check valid customer ID
-		ctmID, err := primitive.ObjectIDFromHex(payload.CustomerID)
-		if err != nil {
-			return util.Response400(c, err.Error())
-		}
-
-		//Set filter
-		filter := bson.M{"_id": ctmID}
 
 		//Validate customer
-		_, err = dao.CustomerFindOne(filter)
+		customer, err := CustomerValidate(payload.CustomerID)
 		if err != nil {
 			return util.Response404(c, err.Error())
 		}
-
-		//Check valid service ID
-		svcID, err := primitive.ObjectIDFromHex(payload.ServiceID)
-		if err != nil {
-			return util.Response400(c, err.Error())
-		}
-
-		//Set filter
-		filter = bson.M{"_id": svcID}
 
 		//Validate service
-		_, err = dao.ServiceFindOne(filter)
+		service, err := ServiceValidate(payload.ServiceID)
 		if err != nil {
 			return util.Response404(c, err.Error())
 		}
 
-		//Set IDs for payload
-		payload.CustomerObjectID = ctmID
-		payload.ServiceObjectID = svcID
-
 		//Set body and move to next process
+		payload.CustomerObjectID = customer.ID
+		payload.ServiceObjectID = service.ID
 		c.Set("body", payload)
 		return next(c)
 	}
@@ -76,38 +56,28 @@ func BookingUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
 			payload model.BookingUpdatePayload
+			err     error
 		)
 
 		//Bind and parse to struct
 		if err := c.Bind(&payload); err != nil {
 			return util.Response400(c, err.Error())
 		}
-		_, err := govalidator.ValidateStruct(payload)
 
 		//Validate struct
+		_, err = govalidator.ValidateStruct(payload)
 		if err != nil {
 			return util.Response400(c, err.Error())
 		}
-
-		//Check valid service ID
-		svcID, err := primitive.ObjectIDFromHex(payload.ServiceID)
-		if err != nil {
-			return util.Response400(c, err.Error())
-		}
-
-		//Set filter
-		filter := bson.M{"_id": svcID}
 
 		//Validate service
-		_, err = dao.ServiceFindOne(filter)
+		service, err := ServiceValidate(payload.ServiceID)
 		if err != nil {
 			return util.Response404(c, err.Error())
 		}
 
-		//Set IDs for payload
-		payload.ServiceObjectID = svcID
-
 		//Set body and move to next process
+		payload.ServiceObjectID = service.ID
 		c.Set("body", payload)
 		return next(c)
 	}
@@ -117,22 +87,11 @@ func BookingUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 func BookingCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			id      = c.Param("id")
-			_id     primitive.ObjectID
-			booking model.Booking
+			id = c.Param("id")
 		)
 
-		//Bind ID
-		_id, err := primitive.ObjectIDFromHex(id)
-		if err != nil {
-			return util.Response400(c, err.Error())
-		}
-
-		//Set filter
-		filter := bson.M{"_id": _id}
-
 		//Validate booking
-		booking, err = dao.BookingFindOne(filter)
+		booking, err := BookingValidate(id)
 		if err != nil {
 			return util.Response404(c, err.Error())
 		}
@@ -147,52 +106,37 @@ func BookingCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 func BookingFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			customerID                    = c.QueryParam("customer_id")
-			serviceID                     = c.QueryParam("service_id")
-			page                          = c.QueryParam("page")
-			status                        = c.QueryParam("status")
-			p                             = 1
-			ctmID      primitive.ObjectID = [12]byte{}
-			svcID      primitive.ObjectID = [12]byte{}
-			err        error
+			query    model.BookingQuery
+			err      error
+			service  model.Service
+			customer model.Customer
 		)
 
-		//Check valid page param
-		if page != "" {
-			p, err = strconv.Atoi(page)
-			if err != nil || p < 1 {
-				return util.Response400(c, err.Error())
-			}
+		//Bind and parse to struct
+		if err = c.Bind(&query); err != nil {
+			return util.Response400(c, err.Error())
 		}
-		c.Set("page", p)
 
-		//Check valid page param
-		if status != "" {
-			_, err = strconv.ParseBool(status)
+		//Validate service
+		if query.ServiceID != "" {
+			service, err = ServiceValidate(query.ServiceID)
 			if err != nil {
 				return util.Response400(c, err.Error())
 			}
 		}
 
-		//Check valid customerID and set body
-		if customerID != "" {
-			ctmID, err = primitive.ObjectIDFromHex(customerID)
+		//Validate customer
+		if query.ServiceID != "" {
+			customer, err = CustomerValidate(query.CustomerID)
 			if err != nil {
 				return util.Response400(c, err.Error())
 			}
 		}
-		c.Set("customerID", ctmID)
 
-		//Check valid customerID and set body
-		if serviceID != "" {
-			svcID, err = primitive.ObjectIDFromHex(serviceID)
-			if err != nil {
-				return util.Response400(c, err.Error())
-			}
-		}
-		c.Set("serviceID", svcID)
-
-		//Move to next process
+		//Set body and move to next process
+		query.ServiceObjectID = service.ID
+		query.CustomerObjectID = customer.ID
+		c.Set("query", query)
 		return next(c)
 	}
 }
@@ -202,22 +146,11 @@ func BookingOwner(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
 			id       = c.Param("id")
-			_id      primitive.ObjectID
-			booking  model.Booking
 			customer = c.Get("authcustomer").(model.Customer)
 		)
 
-		//Bind ID
-		_id, err := primitive.ObjectIDFromHex(id)
-		if err != nil {
-			return util.Response400(c, err.Error())
-		}
-
-		//Set filter
-		filter := bson.M{"_id": _id}
-
 		//Validate booking
-		booking, err = dao.BookingFindOne(filter)
+		booking, err := BookingValidate(id)
 		if err != nil {
 			return util.Response404(c, err.Error())
 		}
@@ -234,4 +167,22 @@ func BookingOwner(next echo.HandlerFunc) echo.HandlerFunc {
 		//Move to next process
 		return next(c)
 	}
+}
+
+// BookingValidate ...
+func BookingValidate(bookingID string) (booking model.Booking, err error) {
+
+	//Check valid booking ID
+	bkID, err := primitive.ObjectIDFromHex(bookingID)
+	if err != nil {
+		return
+	}
+
+	//Set filter
+	filter := bson.M{"_id": bkID}
+
+	//Validate booking
+	booking, err = dao.BookingFindOne(filter)
+
+	return
 }

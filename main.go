@@ -38,6 +38,11 @@ func main() {
 	//CORS
 	e.Use(middleware.CORS())
 
+	//Logger
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "method=${method}, uri=${uri}, status=${status}\n",
+	}))
+
 	//Swagger
 	e.GET("/spec/*", echoSwagger.WrapHandler)
 

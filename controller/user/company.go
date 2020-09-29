@@ -62,20 +62,26 @@ func CompanyDetail(c echo.Context) error {
 // @Failure 404 {object} util.Response
 //
 // @Security BearerToken
-// @Router /user/companies/ [get]
+// @Router /user/companies [get]
 func CompanyList(c echo.Context) error {
 	var (
-		name   = c.QueryParam("name")
-		page   = c.Get("page").(int)
-		active = c.QueryParam("active")
+		queryValues = c.Get("query").(model.CompanyQuery)
+		query       = model.AppQuery{
+			Name:   queryValues.Name,
+			Page:   queryValues.Page,
+			Active: queryValues.Active,
+		}
 	)
 
 	//Get company list
-	result, err := service.CompanyList(name, page, active)
+	result, err := service.CompanyList(query)
 
-	//If error, return 404
+	//Handle errors
 	if err != nil {
-		return util.Response404(c, err.Error())
+		//If list is not empty, return 400
+		if !util.IsEmptyListError(err) {
+			return util.Response400(c, err.Error())
+		}
 	}
 
 	//Return 200

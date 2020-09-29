@@ -8,7 +8,7 @@ import (
 
 // UserClaim ...
 type UserClaim struct {
-	ID string `json:"_id"`
+	ID string
 	jwt.StandardClaims
 }
 

@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"errors"
 	"garagesvc/dao"
 	"garagesvc/model"
 	"garagesvc/util"
@@ -23,9 +24,9 @@ func CompanyCreate(next echo.HandlerFunc) echo.HandlerFunc {
 		if err := c.Bind(&payload); err != nil {
 			return util.Response400(c, err.Error())
 		}
-		_, err := govalidator.ValidateStruct(payload)
 
 		//Validate struct
+		_, err := govalidator.ValidateStruct(payload)
 		if err != nil {
 			return util.Response400(c, err.Error())
 		}
@@ -73,22 +74,11 @@ func CompanyUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 func CompanyCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			id      = c.Param("id")
-			_id     primitive.ObjectID
-			company model.Company
+			id = c.Param("id")
 		)
 
-		//Bind ID
-		_id, err := primitive.ObjectIDFromHex(id)
-		if err != nil {
-			return util.Response400(c, err.Error())
-		}
-
-		//Set filter
-		filter := bson.M{"_id": _id}
-
 		//Validate company
-		company, err = dao.CompanyFindOne(filter)
+		company, err := CompanyValidate(id)
 		if err != nil {
 			return util.Response404(c, err.Error())
 		}
@@ -103,30 +93,43 @@ func CompanyCheckExistance(next echo.HandlerFunc) echo.HandlerFunc {
 func CompanyFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var (
-			page   = c.QueryParam("page")
-			active = c.QueryParam("active")
-			p      = 1
-			err    error
+			query model.CompanyQuery
+			err   error
 		)
 
-		//Check valid page param
-		if page != "" {
-			p, err = strconv.Atoi(page)
-			if err != nil {
-				return util.Response400(c, err.Error())
-			}
+		//Bind and parse to struct
+		if err := c.Bind(&query); err != nil {
+			return util.Response400(c, err.Error())
 		}
 
-		//Check valid active param
-		if active != "" {
-			_, err = strconv.ParseBool(active)
-			if err != nil {
+		//Validate active param
+		if query.Active != "" {
+			if query.Active != "all" && query.Active != "active" && query.Active != "inactive" {
+				err = errors.New("invalid active query param")
 				return util.Response400(c, err.Error())
 			}
 		}
 
 		//Set body and move to next process
-		c.Set("page", p)
+		c.Set("query", query)
 		return next(c)
 	}
+}
+
+// CompanyValidate ...
+func CompanyValidate(companyID string) (company model.Company, err error) {
+
+	//Check valid company ID
+	cpnID, err := primitive.ObjectIDFromHex(companyID)
+	if err != nil {
+		return
+	}
+
+	//Set filter
+	filter := bson.M{"_id": cpnID}
+
+	//Validate company
+	company, err = dao.CompanyFindOne(filter)
+
+	return
 }

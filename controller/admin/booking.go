@@ -6,7 +6,6 @@ import (
 	"garagesvc/util"
 
 	"github.com/labstack/echo/v4"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // BookingCreate godoc
@@ -26,14 +25,14 @@ import (
 // @Failure 404 {object} util.Response
 //
 // @Security BearerToken
-// @Router /admin/bookings/ [post]
+// @Router /admin/bookings [post]
 func BookingCreate(c echo.Context) error {
 	var (
 		payload = c.Get("body").(model.BookingCreatePayload)
 	)
 
 	//Create booking
-	result, err := service.BookingCreate(payload, nil)
+	result, err := service.BookingCreate(payload, payload.CustomerObjectID)
 
 	//If error, return 404
 	if err != nil {
@@ -99,21 +98,27 @@ func BookingDetail(c echo.Context) error {
 // @Failure 404 {object} util.Response
 //
 // @Security BearerToken
-// @Router /admin/bookings/ [get]
+// @Router /admin/bookings [get]
 func BookingList(c echo.Context) error {
 	var (
-		status     = c.QueryParam("status")
-		serviceID  = c.Get("serviceID").(primitive.ObjectID)
-		customerID = c.Get("customerID").(primitive.ObjectID)
-		page       = c.Get("page").(int)
+		queryValues = c.Get("query").(model.BookingQuery)
+		query       = model.AppQuery{
+			Status:     queryValues.Status,
+			Page:       queryValues.Page,
+			ServiceID:  queryValues.ServiceObjectID,
+			CustomerID: queryValues.CustomerObjectID,
+		}
 	)
 
 	//Get booking list
-	result, err := service.BookingList(status, serviceID, customerID, page)
+	result, err := service.BookingList(query)
 
-	//If error, return 400
+	//Handle errors
 	if err != nil {
-		return util.Response400(c, err.Error())
+		//If list is not empty, return 400
+		if !util.IsEmptyListError(err) {
+			return util.Response400(c, err.Error())
+		}
 	}
 
 	//Return 200

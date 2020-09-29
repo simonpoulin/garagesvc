@@ -4,10 +4,12 @@ import (
 	"context"
 	"garagesvc/model"
 	"garagesvc/module/mongodb"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // CustomerCreate ...
-func CustomerCreate(customer model.Customer) (err error) {
+func CustomerCreate(customer model.CustomerCreateBSON) (err error) {
 	var (
 		customerCol = mongodb.CustomerCol()
 		ctx         = context.Background()
@@ -17,7 +19,7 @@ func CustomerCreate(customer model.Customer) (err error) {
 }
 
 // CustomerFindOne ...
-func CustomerFindOne(filter interface{}) (customer model.Customer, err error) {
+func CustomerFindOne(filter bson.M) (customer model.Customer, err error) {
 	var (
 		customerCol = mongodb.CustomerCol()
 		ctx         = context.Background()
@@ -27,13 +29,13 @@ func CustomerFindOne(filter interface{}) (customer model.Customer, err error) {
 }
 
 // CustomerFind ...
-func CustomerFind(filter interface{}) (customerList []model.Customer, err error) {
+func CustomerFind(filter []bson.M) (customerList []model.Customer, err error) {
 	var (
 		customerCol = mongodb.CustomerCol()
 		ctx         = context.Background()
 	)
 	// Looking for customers
-	cur, err := customerCol.Find(ctx, filter)
+	cur, err := customerCol.Aggregate(ctx, filter)
 	if err != nil {
 		return
 	}
@@ -45,7 +47,7 @@ func CustomerFind(filter interface{}) (customerList []model.Customer, err error)
 }
 
 // CustomerUpdateOne ...
-func CustomerUpdateOne(filter interface{}, data interface{}) (err error) {
+func CustomerUpdateOne(filter bson.M, data bson.M) (err error) {
 	var (
 		customerCol = mongodb.CustomerCol()
 		ctx         = context.Background()
@@ -55,7 +57,7 @@ func CustomerUpdateOne(filter interface{}, data interface{}) (err error) {
 }
 
 // CustomerDelete ...
-func CustomerDelete(filter interface{}) (err error) {
+func CustomerDelete(filter bson.M) (err error) {
 	var (
 		customerCol = mongodb.CustomerCol()
 		ctx         = context.Background()

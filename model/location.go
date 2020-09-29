@@ -2,6 +2,13 @@ package model
 
 // Location ...
 type Location struct {
-	_type       string
-	coordinates [2]float32
+	Type        string      `json:"type" bson:"type"`
+	Coordinates Coordinates `json:"coordinates" bson:"coordinates"`
+}
+
+//Coordinates ...
+type Coordinates struct {
+	Latitude  float32 `json:"lat" bson:"lat"`
+	Longitude float32 `json:"lng" bson:"lng"`
+	Accuracy  int     `json:"acc" bson:"acc"`
 }

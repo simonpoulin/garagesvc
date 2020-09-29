@@ -10,33 +10,62 @@ import (
 // Customer ...
 type Customer struct {
 	ID       primitive.ObjectID `json:"_id" bson:"_id"`
-	Name     string             `json:"name" bson:"name" validator:"required, max=10, alphanumunicode"`
-	Phone    string             `json:"phone" bson:"phone" validator:"required, eq=10, numeric"`
-	Password string             `json:"password" bson:"password" validator:"required, min=6, max=20"`
+	Name     string             `json:"name" bson:"name"`
+	Phone    string             `json:"phone" bson:"phone"`
+	Password string             `json:"password" bson:"password"`
 }
 
-// CustomerLoginPayload ...
-type CustomerLoginPayload struct {
-	Phone    string `json:"phone" bson:"phone" valid:"required, type(string), stringlength(10|10)"`
-	Password string `json:"password" bson:"password" valid:"required, type(string), stringlength(6|20)"`
+// CustomerCreateBSON ...
+type CustomerCreateBSON struct {
+	ID           primitive.ObjectID `bson:"_id"`
+	Name         string             `bson:"name"`
+	Phone        string             `bson:"phone"`
+	Password     string             `bson:"password"`
+	SearchString string             `bson:"searchstring"`
 }
 
-// CustomerRegisterPayload ...
-type CustomerRegisterPayload struct {
-	Name     string `json:"name" bson:"name" valid:"required, stringlength(1|20)"`
-	Phone    string `json:"phone" bson:"phone" valid:"required, type(string), stringlength(10|10)"`
-	Password string `json:"password" bson:"password" valid:"required, type(string), stringlength(6|20)"`
+// CustomerUpdateBSON ...
+type CustomerUpdateBSON struct {
+	Name         string `bson:"name"`
+	Password     string `bson:"password"`
+	SearchString string `bson:"searchstring"`
 }
 
-// CustomerUpdatePayload ...
-type CustomerUpdatePayload struct {
-	Name     string `json:"name" bson:"name" valid:"required, stringlength(1|20)"`
-	Password string `json:"password" bson:"password" valid:"required, type(string), stringlength(6|20)"`
+// ConvertToCreateBSON ...
+func (payload CustomerRegisterPayload) ConvertToCreateBSON() (customerBSON CustomerCreateBSON) {
+	customerBSON = CustomerCreateBSON{
+		ID:           primitive.NewObjectID(),
+		Name:         payload.Name,
+		Phone:        payload.Phone,
+		Password:     util.Hash(payload.Password),
+		SearchString: util.ConvertToHex(payload.Name),
+	}
+	return
+}
+
+// ConvertToUpdateBSON ...
+func (payload CustomerUpdatePayload) ConvertToUpdateBSON() (customerBSON CustomerUpdateBSON) {
+	customerBSON = CustomerUpdateBSON{
+		Name:         payload.Name,
+		Password:     util.Hash(payload.Password),
+		SearchString: util.ConvertToHex(payload.Name),
+	}
+	return
 }
 
 // GenerateToken ...
 func (c Customer) GenerateToken() (token string, err error) {
 	env := config.GetENV()
 	token, err = util.TokenEncode(c.ID.Hex(), env.CustomerKey)
+	return
+}
+
+// ConvertToUpdateSearchStringBSON ...
+func (c Customer) ConvertToUpdateSearchStringBSON() (companyBSON CustomerUpdateBSON) {
+	companyBSON = CustomerUpdateBSON{
+		Name:         c.Name,
+		Password:     util.Hash(c.Password),
+		SearchString: util.ConvertToHex(c.Name),
+	}
 	return
 }

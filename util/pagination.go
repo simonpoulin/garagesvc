@@ -8,10 +8,10 @@ import (
 
 // PagedList ...
 type PagedList struct {
-	Data        []interface{} `json:"data"`
-	CurrentPage int           `json:"currentpage"`
-	TotalPage   int           `json:"totalpage"`
-	Limit       int           `json:"limit"`
+	List  []interface{} `json:"list"`
+	Page  int           `json:"page"`
+	Total int           `json:"total"`
+	Limit int           `json:"limit"`
 }
 
 // Paging ...
@@ -27,16 +27,23 @@ func Paging(list interface{}, page int, limit int) (pagedList PagedList, err err
 		return
 	}
 
+	// Check empty list
+	listSize := len(unpagedList)
+	if listSize == 0 {
+		err = errors.New("empty list")
+		return
+	}
+
 	// Calculate total pages
-	totalPage := int(math.Ceil(float64(len(unpagedList)) / float64(limit)))
-	if totalPage < page {
+	totalPage := int(math.Ceil(float64(listSize) / float64(limit)))
+	if totalPage < page+1 {
 		err = errors.New("out of pages")
 		return
 	}
 
 	// Calculate page objects
-	if page == totalPage {
-		pageObjects = len(unpagedList) % limit
+	if totalPage == page+1 {
+		pageObjects = listSize % limit
 		if pageObjects == 0 {
 			pageObjects = limit
 		}
@@ -45,16 +52,16 @@ func Paging(list interface{}, page int, limit int) (pagedList PagedList, err err
 	}
 
 	// Set list data
-	firstObject := (page - 1) * limit
+	firstObject := page * limit
 	lastObject := firstObject + pageObjects
 	for i := firstObject; i < lastObject; i++ {
 		data = append(data, unpagedList[i])
 	}
 
 	// Set remaining fields
-	pagedList.Data = data
-	pagedList.TotalPage = totalPage
-	pagedList.CurrentPage = page
+	pagedList.List = data
+	pagedList.Total = listSize
+	pagedList.Page = page
 	pagedList.Limit = limit
 	return
 }

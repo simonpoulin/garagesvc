@@ -9,7 +9,7 @@ import (
 )
 
 // EmployeeCreate ...
-func EmployeeCreate(employee model.Employee) (err error) {
+func EmployeeCreate(employee model.EmployeeCreateBSON) (err error) {
 	var (
 		employeeCol = mongodb.EmployeeCol()
 		ctx         = context.Background()
@@ -19,7 +19,7 @@ func EmployeeCreate(employee model.Employee) (err error) {
 }
 
 // EmployeeFindOne ...
-func EmployeeFindOne(filter interface{}) (employee model.Employee, err error) {
+func EmployeeFindOne(filter bson.M) (employee model.Employee, err error) {
 	var (
 		employeeCol = mongodb.EmployeeCol()
 		ctx         = context.Background()
@@ -47,7 +47,7 @@ func EmployeeFind(filter []bson.M) (employeeList []model.Employee, err error) {
 }
 
 // EmployeeUpdateOne ...
-func EmployeeUpdateOne(filter interface{}, data interface{}) (err error) {
+func EmployeeUpdateOne(filter bson.M, data bson.M) (err error) {
 	var (
 		employeeCol = mongodb.EmployeeCol()
 		ctx         = context.Background()
@@ -57,7 +57,7 @@ func EmployeeUpdateOne(filter interface{}, data interface{}) (err error) {
 }
 
 // EmployeeDelete ...
-func EmployeeDelete(filter interface{}) (err error) {
+func EmployeeDelete(filter bson.M) (err error) {
 	var (
 		employeeCol = mongodb.EmployeeCol()
 		ctx         = context.Background()
