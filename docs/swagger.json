@@ -2375,6 +2375,9 @@
         "model.CustomerRegisterPayload": {
             "type": "object",
             "properties": {
+                "address": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -2389,10 +2392,19 @@
         "model.CustomerUpdatePayload": {
             "type": "object",
             "properties": {
+                "address": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                },
+                "resourceObjectID": {
+                    "type": "string"
+                },
+                "resourceid": {
                     "type": "string"
                 }
             }
@@ -2463,7 +2475,7 @@
                 "companyid": {
                     "type": "string"
                 },
-                "desc": {
+                "description": {
                     "type": "string"
                 },
                 "email": {
@@ -2490,7 +2502,7 @@
                 "address": {
                     "type": "string"
                 },
-                "desc": {
+                "description": {
                     "type": "string"
                 },
                 "email": {
@@ -2504,6 +2516,12 @@
                     "type": "string"
                 },
                 "phone": {
+                    "type": "string"
+                },
+                "resourceObjectID": {
+                    "type": "string"
+                },
+                "resourceid": {
                     "type": "string"
                 }
             }

@@ -9,10 +9,15 @@ import (
 
 // Customer ...
 type Customer struct {
-	ID       primitive.ObjectID `json:"_id" bson:"_id"`
-	Name     string             `json:"name" bson:"name"`
-	Phone    string             `json:"phone" bson:"phone"`
-	Password string             `json:"password" bson:"password"`
+	ID          primitive.ObjectID `bson:"_id"`
+	Name        string             `bson:"name"`
+	Phone       string             `bson:"phone"`
+	Password    string             `bson:"password"`
+	Address     string             `bson:"address"`
+	ResourceID  primitive.ObjectID `bson:"resourceid"`
+	SmallImage  string             `bson:"smallimage"`
+	MediumImage string             `bson:"mediumimage"`
+	LargeImage  string             `bson:"largeimage"`
 }
 
 // CustomerCreateBSON ...
@@ -21,34 +26,55 @@ type CustomerCreateBSON struct {
 	Name         string             `bson:"name"`
 	Phone        string             `bson:"phone"`
 	Password     string             `bson:"password"`
+	Address      string             `bson:"address"`
 	SearchString string             `bson:"searchstring"`
+	ResourceID   primitive.ObjectID `bson:"resourceid"`
+	SmallImage   string             `bson:"smallimage"`
+	MediumImage  string             `bson:"mediumimage"`
+	LargeImage   string             `bson:"largeimage"`
 }
 
 // CustomerUpdateBSON ...
 type CustomerUpdateBSON struct {
-	Name         string `bson:"name"`
-	Password     string `bson:"password"`
-	SearchString string `bson:"searchstring"`
+	Name         string             `bson:"name"`
+	Password     string             `bson:"password"`
+	Address      string             `bson:"address"`
+	SearchString string             `bson:"searchstring"`
+	ResourceID   primitive.ObjectID `bson:"resourceid"`
+	SmallImage   string             `bson:"smallimage"`
+	MediumImage  string             `bson:"mediumimage"`
+	LargeImage   string             `bson:"largeimage"`
 }
 
 // ConvertToCreateBSON ...
 func (payload CustomerRegisterPayload) ConvertToCreateBSON() (customerBSON CustomerCreateBSON) {
+	// Get default img name
+	img := config.GetIMG()
 	customerBSON = CustomerCreateBSON{
 		ID:           primitive.NewObjectID(),
 		Name:         payload.Name,
 		Phone:        payload.Phone,
 		Password:     util.Hash(payload.Password),
+		Address:      payload.Address,
 		SearchString: util.ConvertToHex(payload.Name),
+		SmallImage:   img.SmallImage,
+		MediumImage:  img.MediumImage,
+		LargeImage:   img.LargeImage,
 	}
 	return
 }
 
 // ConvertToUpdateBSON ...
-func (payload CustomerUpdatePayload) ConvertToUpdateBSON() (customerBSON CustomerUpdateBSON) {
+func (payload CustomerUpdatePayload) ConvertToUpdateBSON(resource Resource) (customerBSON CustomerUpdateBSON) {
 	customerBSON = CustomerUpdateBSON{
 		Name:         payload.Name,
-		Password:     util.Hash(payload.Password),
+		Password:     payload.Password,
+		Address:      payload.Address,
 		SearchString: util.ConvertToHex(payload.Name),
+		ResourceID:   payload.ResourceObjectID,
+		SmallImage:   resource.SmallImage.GetName(),
+		MediumImage:  resource.MediumImage.GetName(),
+		LargeImage:   resource.LargeImage.GetName(),
 	}
 	return
 }
@@ -65,6 +91,7 @@ func (c Customer) ConvertToUpdateSearchStringBSON() (companyBSON CustomerUpdateB
 	companyBSON = CustomerUpdateBSON{
 		Name:         c.Name,
 		Password:     util.Hash(c.Password),
+		Address:      c.Address,
 		SearchString: util.ConvertToHex(c.Name),
 	}
 	return

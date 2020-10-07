@@ -24,19 +24,28 @@ func BookingCreate(payload model.BookingCreatePayload, customerID primitive.Obje
 }
 
 // BookingDetail ...
-func BookingDetail(id primitive.ObjectID) (booking model.Booking, err error) {
+func BookingDetail(id primitive.ObjectID) (bookingRes model.BookingResponse, err error) {
 
-	//Set filter
-	filter := bson.M{"_id": id}
+	//Set booking filter
+	bookingFilter := bson.M{"_id": id}
 
 	//Looking for booking from database
-	booking, err = dao.BookingFindOne(filter)
+	booking, err := dao.BookingFindOne(bookingFilter)
+	if err != nil {
+		return
+	}
+
+	bookingRes, err = BookingConvertToResponse(booking)
+
 	return
 }
 
 // BookingList ...
 func BookingList(query model.AppQuery) (bookingList util.PagedList, err error) {
-	var findQuery = query.GenerateFindQuery()
+	var (
+		findQuery      = query.GenerateFindQuery()
+		bookingListRes []model.BookingResponse
+	)
 
 	//Get bookings
 	bookings, err := dao.BookingFind(findQuery)
@@ -44,8 +53,18 @@ func BookingList(query model.AppQuery) (bookingList util.PagedList, err error) {
 		return
 	}
 
+	//Get booking response list
+	for _, booking := range bookings {
+		var bookingRes model.BookingResponse
+		bookingRes, err = BookingConvertToResponse(booking)
+		if err != nil {
+			return
+		}
+		bookingListRes = append(bookingListRes, bookingRes)
+	}
+
 	//Paging list
-	bookingList, err = util.Paging(bookings, query.Page, 8)
+	bookingList, err = util.Paging(bookingListRes, query.Page, 8)
 
 	return
 }
@@ -55,7 +74,7 @@ func BookingUpdate(id primitive.ObjectID, payload model.BookingUpdatePayload) (b
 
 	//Set filter and data
 	filter := bson.M{"_id": id}
-	data := bson.M{"$set": payload.ConvertToUpdateBSON}
+	data := bson.M{"$set": payload.ConvertToUpdateBSON()}
 
 	//Update booking
 	err = dao.BookingUpdateOne(filter, data)
@@ -73,5 +92,32 @@ func BookingDelete(id primitive.ObjectID) (err error) {
 
 	//Delete booking
 	err = dao.BookingDelete(filter)
+	return
+}
+
+// BookingConvertToResponse ...
+func BookingConvertToResponse(b model.Booking) (res model.BookingResponse, err error) {
+	res = model.BookingResponse{
+		ID:        b.ID,
+		Status:    b.Status,
+		Date:      b.Date,
+		CreatedAt: b.CreatedAt,
+		Note:      b.Note,
+	}
+
+	//Get service
+	service, err := ServiceDetail(b.ServiceID)
+	if err != nil {
+		return
+	}
+	res.Service = service
+
+	//Get customer
+	customer, err := CustomerDetail(b.CustomerID)
+	if err != nil {
+		return
+	}
+	res.Customer = customer
+
 	return
 }

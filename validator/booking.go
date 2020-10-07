@@ -2,6 +2,7 @@ package validator
 
 import (
 	"errors"
+	"fmt"
 	"garagesvc/dao"
 	"garagesvc/model"
 	"garagesvc/util"
@@ -121,14 +122,16 @@ func BookingFindRequest(next echo.HandlerFunc) echo.HandlerFunc {
 		if query.ServiceID != "" {
 			service, err = ServiceValidate(query.ServiceID)
 			if err != nil {
+				fmt.Println("yeet!!!!!")
 				return util.Response400(c, err.Error())
 			}
 		}
 
 		//Validate customer
-		if query.ServiceID != "" {
+		if query.CustomerID != "" {
 			customer, err = CustomerValidate(query.CustomerID)
 			if err != nil {
+				fmt.Println("yeet!!!!!-------")
 				return util.Response400(c, err.Error())
 			}
 		}

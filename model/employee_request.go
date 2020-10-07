@@ -17,7 +17,7 @@ type EmployeeRegisterPayload struct {
 type EmployeeUpdatePayload struct {
 	Name     string `json:"name" valid:"required, stringlength(1|20)"`
 	Phone    string `json:"phone" valid:"required, type(string), stringlength(10|10)"`
-	Password string `json:"password" valid:"required, type(string), stringlength(6|20)"`
+	Password string `json:"password" valid:"required, type(string), stringlength(6|50)"`
 	Active   bool   `json:"active" valid:"required, type(bool)"`
 }
 

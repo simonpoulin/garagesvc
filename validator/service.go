@@ -71,6 +71,15 @@ func ServiceUpdate(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 		}
 
+		//Validate resource
+		if payload.ResourceID != "" {
+			resource, err := ResourceValidate(payload.ResourceID)
+			if err != nil {
+				return util.Response400(c, err.Error())
+			}
+			payload.ResourceObjectID = resource.ID
+		}
+
 		//Set body and move to next process
 		c.Set("body", payload)
 		return next(c)

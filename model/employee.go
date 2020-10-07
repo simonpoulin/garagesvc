@@ -9,11 +9,11 @@ import (
 
 // Employee ...
 type Employee struct {
-	ID       primitive.ObjectID `json:"_id" bson:"_id"`
-	Name     string             `json:"name" bson:"name"`
-	Phone    string             `json:"phone" bson:"phone"`
-	Password string             `json:"password" bson:"password"`
-	Active   bool               `json:"active" bson:"active"`
+	ID       primitive.ObjectID `bson:"_id"`
+	Name     string             `bson:"name"`
+	Phone    string             `bson:"phone"`
+	Password string             `bson:"password"`
+	Active   bool               `bson:"active"`
 }
 
 // EmployeeCreateBSON ...

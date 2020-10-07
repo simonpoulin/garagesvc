@@ -24,20 +24,29 @@ func CompanyCreate(payload model.CompanyCreatePayload) (companyID primitive.Obje
 }
 
 // CompanyDetail ...
-func CompanyDetail(id primitive.ObjectID) (company model.Company, err error) {
+func CompanyDetail(id primitive.ObjectID) (companyRes model.CompanyResponse, err error) {
 
 	//Set filter
 	filter := bson.M{"_id": id}
 
 	//Looking for company from database
-	company, err = dao.CompanyFindOne(filter)
+	company, err := dao.CompanyFindOne(filter)
+	if err != nil {
+		return
+	}
+
+	companyRes, err = CompanyConvertToResponse(company)
+
 	return
 }
 
 // CompanyList ...
 func CompanyList(query model.AppQuery) (companyList util.PagedList, err error) {
 
-	var findQuery = query.GenerateFindQuery()
+	var (
+		findQuery      = query.GenerateFindQuery()
+		companyListRes []model.CompanyResponse
+	)
 
 	//Get companies
 	companies, err := dao.CompanyFind(findQuery)
@@ -45,8 +54,17 @@ func CompanyList(query model.AppQuery) (companyList util.PagedList, err error) {
 		return
 	}
 
+	for _, company := range companies {
+		var companyRes model.CompanyResponse
+		companyRes, err = CompanyConvertToResponse(company)
+		if err != nil {
+			return
+		}
+		companyListRes = append(companyListRes, companyRes)
+	}
+
 	//Paging list
-	companyList, err = util.Paging(companies, query.Page, 8)
+	companyList, err = util.Paging(companyListRes, query.Page, 8)
 
 	return
 }
@@ -81,10 +99,45 @@ func CompanyUpdate(id primitive.ObjectID, payload model.CompanyUpdatePayload, ac
 // CompanyDelete ...
 func CompanyDelete(id primitive.ObjectID) (err error) {
 
-	//Set filter
-	filter := bson.M{"_id": id}
+	//Set company filter
+	companyFilter := bson.M{"_id": id}
+
+	//Set service query
+	query := model.AppQuery{
+		CompanyID: id,
+	}
+	findQuery := query.GenerateFindQuery()
+
+	//Get services
+	services, err := dao.ServiceFind(findQuery)
+	if err != nil {
+		return
+	}
+
+	//Delete services
+	for _, service := range services {
+		err = ServiceDelete(service.ID)
+		if err != nil {
+			return
+		}
+	}
 
 	//Delete company
-	err = dao.CompanyDelete(filter)
+	err = dao.CompanyDelete(companyFilter)
+
+	return
+}
+
+// CompanyConvertToResponse ...
+func CompanyConvertToResponse(c model.Company) (res model.CompanyResponse, err error) {
+	res = model.CompanyResponse{
+		ID:       c.ID,
+		Name:     c.Name,
+		Location: c.Location,
+		Email:    c.Email,
+		Address:  c.Address,
+		Phone:    c.Phone,
+		Active:   c.Active,
+	}
 	return
 }

@@ -74,6 +74,8 @@ definitions:
     type: object
   model.CustomerRegisterPayload:
     properties:
+      address:
+        type: string
       name:
         type: string
       password:
@@ -83,9 +85,15 @@ definitions:
     type: object
   model.CustomerUpdatePayload:
     properties:
+      address:
+        type: string
       name:
         type: string
       password:
+        type: string
+      resourceObjectID:
+        type: string
+      resourceid:
         type: string
     type: object
   model.EmployeeLoginPayload:
@@ -131,7 +139,7 @@ definitions:
         type: string
       companyid:
         type: string
-      desc:
+      description:
         type: string
       email:
         type: string
@@ -149,7 +157,7 @@ definitions:
         type: boolean
       address:
         type: string
-      desc:
+      description:
         type: string
       email:
         type: string
@@ -159,6 +167,10 @@ definitions:
       name:
         type: string
       phone:
+        type: string
+      resourceObjectID:
+        type: string
+      resourceid:
         type: string
     type: object
   util.Response:

@@ -15,5 +15,5 @@ func common(e *echo.Echo) {
 	group.POST("/customer-register", controller.CustomerRegister, validator.CustomerRegister)
 	group.POST("/customer-login", controller.CustomerLogin, validator.CustomerLogin)
 	group.POST("/test-string", controller.TestString)
-	// group.POST("/test-location", controller.TestLocation)
+	group.POST("/test-upload", controller.TestUpload)
 }

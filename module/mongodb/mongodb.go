@@ -53,3 +53,8 @@ func ServiceCol() *mongo.Collection {
 func CustomerCol() *mongo.Collection {
 	return db.Collection("Customers")
 }
+
+// ResourceCol ...
+func ResourceCol() *mongo.Collection {
+	return db.Collection("Resources")
+}

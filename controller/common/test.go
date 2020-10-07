@@ -1,9 +1,12 @@
 package common
 
 import (
+	"fmt"
 	"garagesvc/dao"
 	"garagesvc/model"
 	"garagesvc/util"
+	"io"
+	"os"
 
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/bson"
@@ -98,7 +101,45 @@ func TestString(c echo.Context) error {
 	return util.Response200(c, "", nil)
 }
 
-// // TestString ...
-// func TestString(c echo.Context) error {
+// TestUpload ...
+func TestUpload(c echo.Context) error {
+	var (
+		path string = "assets/img"
+	)
 
-// }
+	file, err := c.FormFile("file")
+	if err != nil {
+		fmt.Println(err.Error())
+		fmt.Println(file)
+		return util.Response404(c, err.Error())
+	}
+	fmt.Println("1")
+	src, err := file.Open()
+	if err != nil {
+		return util.Response404(c, err.Error())
+	}
+	defer src.Close()
+	fmt.Println("2")
+	if _, err := os.Stat(path); err != nil || os.IsNotExist(err) {
+		os.MkdirAll(path, 0755)
+		fmt.Println("Path not exist")
+	}
+	fmt.Println("3")
+	path = path + "/" + file.Filename
+
+	dst, err := os.Create(path)
+	if err != nil {
+		return util.Response404(c, err.Error())
+	}
+	fmt.Println("4")
+	defer dst.Close()
+	fmt.Println("Source: ", src)
+	fmt.Println("Destination: ", dst)
+	fmt.Println("Destination: ", file.Filename)
+
+	if _, err = io.Copy(dst, src); err != nil {
+		return util.Response404(c, err.Error())
+	}
+
+	return util.Response200(c, "<p>File %s uploaded successfully.</p>", nil)
+}

@@ -12,4 +12,5 @@ func Bootstrap(e *echo.Echo) {
 	admin.RouteAdmin(e)
 	user.RouteUser(e)
 	common(e)
+	resource(e)
 }

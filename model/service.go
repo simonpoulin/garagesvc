@@ -1,6 +1,7 @@
 package model
 
 import (
+	"garagesvc/config"
 	"garagesvc/util"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -8,15 +9,19 @@ import (
 
 // Service ...
 type Service struct {
-	ID          primitive.ObjectID `json:"_id" bson:"_id"`
-	CompanyID   primitive.ObjectID `json:"companyid" bson:"companyid"`
-	Name        string             `json:"name" bson:"name"`
-	Location    Location           `json:"location" bson:"location"`
-	Address     string             `json:"address" bson:"address"`
-	Active      bool               `json:"active" bson:"active"`
-	Phone       string             `json:"phone" bson:"phone"`
-	Email       string             `json:"email" bson:"email"`
-	Description string             `json:"desc" bson:"desc"`
+	ID          primitive.ObjectID `bson:"_id"`
+	CompanyID   primitive.ObjectID `bson:"companyid"`
+	Name        string             `bson:"name"`
+	Location    Location           `bson:"location"`
+	Address     string             `bson:"address"`
+	Active      bool               `bson:"active"`
+	Phone       string             `bson:"phone"`
+	Email       string             `bson:"email"`
+	Description string             `bson:"desc"`
+	ResourceID  primitive.ObjectID `bson:"resource"`
+	SmallImage  string             `bson:"smallimage"`
+	MediumImage string             `bson:"mediumimage"`
+	LargeImage  string             `bson:"largeimage"`
 }
 
 // ServiceCreateBSON ...
@@ -31,22 +36,32 @@ type ServiceCreateBSON struct {
 	Email        string             `bson:"email"`
 	Description  string             `bson:"desc"`
 	SearchString string             `bson:"searchstring"`
+	ResourceID   primitive.ObjectID `bson:"resourceid"`
+	SmallImage   string             `bson:"smallimage"`
+	MediumImage  string             `bson:"mediumimage"`
+	LargeImage   string             `bson:"largeimage"`
 }
 
 // ServiceUpdateBSON ...
 type ServiceUpdateBSON struct {
-	Name         string   `bson:"name"`
-	Location     Location `bson:"location"`
-	Address      string   `bson:"address"`
-	Active       bool     `bson:"active"`
-	Phone        string   `bson:"phone"`
-	Email        string   `bson:"email"`
-	Description  string   `bson:"desc"`
-	SearchString string   `bson:"searchstring"`
+	Name         string             `bson:"name"`
+	Location     Location           `bson:"location"`
+	Address      string             `bson:"address"`
+	Active       bool               `bson:"active"`
+	Phone        string             `bson:"phone"`
+	Email        string             `bson:"email"`
+	Description  string             `bson:"desc"`
+	SearchString string             `bson:"searchstring"`
+	ResourceID   primitive.ObjectID `bson:"resourceid"`
+	SmallImage   string             `bson:"smallimage"`
+	MediumImage  string             `bson:"mediumimage"`
+	LargeImage   string             `bson:"largeimage"`
 }
 
 // ConvertToCreateBSON ...
 func (payload ServiceCreatePayload) ConvertToCreateBSON() (serviceBSON ServiceCreateBSON) {
+	// Get default img name
+	img := config.GetIMG()
 	serviceBSON = ServiceCreateBSON{
 		ID:           primitive.NewObjectID(),
 		CompanyID:    payload.CompanyObjectID,
@@ -58,12 +73,15 @@ func (payload ServiceCreatePayload) ConvertToCreateBSON() (serviceBSON ServiceCr
 		Email:        payload.Email,
 		Description:  payload.Description,
 		SearchString: util.ConvertToHex(payload.Name),
+		SmallImage:   img.SmallImage,
+		MediumImage:  img.MediumImage,
+		LargeImage:   img.LargeImage,
 	}
 	return
 }
 
 // ConvertToUpdateBSON ...
-func (payload ServiceUpdatePayload) ConvertToUpdateBSON() (serviceBSON ServiceUpdateBSON) {
+func (payload ServiceUpdatePayload) ConvertToUpdateBSON(resource Resource) (serviceBSON ServiceUpdateBSON) {
 	serviceBSON = ServiceUpdateBSON{
 		Name:         payload.Name,
 		Location:     payload.Location,
@@ -73,6 +91,9 @@ func (payload ServiceUpdatePayload) ConvertToUpdateBSON() (serviceBSON ServiceUp
 		Email:        payload.Email,
 		Description:  payload.Description,
 		SearchString: util.ConvertToHex(payload.Name),
+		SmallImage:   resource.SmallImage.GetName(),
+		MediumImage:  resource.MediumImage.GetName(),
+		LargeImage:   resource.LargeImage.GetName(),
 	}
 	return
 }

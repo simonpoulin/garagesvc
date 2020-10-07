@@ -8,13 +8,13 @@ import (
 
 // Booking ...
 type Booking struct {
-	ID         primitive.ObjectID `json:"_id" bson:"_id"`
-	CustomerID primitive.ObjectID `json:"customerid" bson:"customerid"`
-	ServiceID  primitive.ObjectID `json:"serviceid" bson:"serviceid"`
-	Status     string             `json:"status" bson:"status"`
-	Date       time.Time          `json:"time" bson:"time"`
-	CreatedAt  time.Time          `json:"createdAt" bson:"createdAt"`
-	Note       string             `json:"note" bson:"note"`
+	ID         primitive.ObjectID `bson:"_id"`
+	CustomerID primitive.ObjectID `bson:"customerid"`
+	ServiceID  primitive.ObjectID `bson:"serviceid"`
+	Status     string             `bson:"status"`
+	Date       time.Time          `bson:"time"`
+	CreatedAt  time.Time          `bson:"createdAt"`
+	Note       string             `bson:"note"`
 }
 
 // BookingCreateBSON ...

@@ -2390,6 +2390,9 @@ var doc = `{
         "model.CustomerRegisterPayload": {
             "type": "object",
             "properties": {
+                "address": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -2404,10 +2407,19 @@ var doc = `{
         "model.CustomerUpdatePayload": {
             "type": "object",
             "properties": {
+                "address": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                },
+                "resourceObjectID": {
+                    "type": "string"
+                },
+                "resourceid": {
                     "type": "string"
                 }
             }
@@ -2478,7 +2490,7 @@ var doc = `{
                 "companyid": {
                     "type": "string"
                 },
-                "desc": {
+                "description": {
                     "type": "string"
                 },
                 "email": {
@@ -2505,7 +2517,7 @@ var doc = `{
                 "address": {
                     "type": "string"
                 },
-                "desc": {
+                "description": {
                     "type": "string"
                 },
                 "email": {
@@ -2519,6 +2531,12 @@ var doc = `{
                     "type": "string"
                 },
                 "phone": {
+                    "type": "string"
+                },
+                "resourceObjectID": {
+                    "type": "string"
+                },
+                "resourceid": {
                     "type": "string"
                 }
             }

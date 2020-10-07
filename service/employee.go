@@ -11,19 +11,28 @@ import (
 )
 
 // EmployeeDetail ...
-func EmployeeDetail(id primitive.ObjectID) (employee model.Employee, err error) {
+func EmployeeDetail(id primitive.ObjectID) (employeeRes model.EmployeeResponse, err error) {
 
 	filter := bson.M{"_id": id}
 
 	//Looking for employee from database
-	employee, err = dao.EmployeeFindOne(filter)
+	employee, err := dao.EmployeeFindOne(filter)
+	if err != nil {
+		return
+	}
+
+	employeeRes, err = EmployeeConvertToResponse(employee)
+
 	return
 }
 
 // EmployeeList ...
 func EmployeeList(query model.AppQuery) (employeeList util.PagedList, err error) {
 
-	var findQuery = query.GenerateFindQuery()
+	var (
+		findQuery       = query.GenerateFindQuery()
+		employeeListRes []model.EmployeeResponse
+	)
 
 	//Get employee list
 	employees, err := dao.EmployeeFind(findQuery)
@@ -31,8 +40,18 @@ func EmployeeList(query model.AppQuery) (employeeList util.PagedList, err error)
 		return
 	}
 
+	//Get employee response list
+	for _, employee := range employees {
+		var employeeRes model.EmployeeResponse
+		employeeRes, err = EmployeeConvertToResponse(employee)
+		if err != nil {
+			return
+		}
+		employeeListRes = append(employeeListRes, employeeRes)
+	}
+
 	//Paging list
-	employeeList, err = util.Paging(employees, query.Page, 8)
+	employeeList, err = util.Paging(employeeListRes, query.Page, 8)
 
 	return
 }
@@ -68,5 +87,18 @@ func EmployeeDelete(id primitive.ObjectID) (err error) {
 
 	//Delete employee
 	err = dao.EmployeeDelete(filter)
+	return
+}
+
+// EmployeeConvertToResponse ...
+func EmployeeConvertToResponse(e model.Employee) (res model.EmployeeResponse, err error) {
+	res = model.EmployeeResponse{
+		ID:       e.ID,
+		Name:     e.Name,
+		Phone:    e.Phone,
+		Password: e.Password,
+		Active:   e.Active,
+	}
+
 	return
 }

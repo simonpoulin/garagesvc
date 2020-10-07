@@ -8,6 +8,7 @@ require (
 	github.com/astaxie/beego v1.12.2
 	github.com/bjarneh/latinx v0.0.0-20120329061922-4dfe9ba2a293
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/disintegration/imaging v1.6.2
 	github.com/flosch/pongo2 v0.0.0-20200805083417-63c99409991d
 	github.com/go-openapi/runtime v0.19.20
 	github.com/go-openapi/spec v0.19.9 // indirect
@@ -16,6 +17,7 @@ require (
 	github.com/go-playground/validator/v10 v10.3.0
 	github.com/go-swagger/go-swagger v0.25.0 // indirect
 	github.com/gobeam/mongo-go-pagination v0.0.1
+	github.com/google/uuid v1.1.1
 	github.com/gorilla/handlers v1.5.0 // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/kr/pretty v0.2.1

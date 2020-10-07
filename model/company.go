@@ -8,13 +8,13 @@ import (
 
 //Company ...
 type Company struct {
-	ID       primitive.ObjectID `json:"_id" bson:"_id"`
-	Name     string             `json:"name" bson:"name"`
-	Location Location           `json:"location" bson:"location"`
-	Email    string             `json:"email" bson:"email"`
-	Address  string             `json:"address" bson:"address"`
-	Phone    string             `json:"phone" bson:"phone"`
-	Active   bool               `json:"active" bson:"active"`
+	ID       primitive.ObjectID `bson:"_id"`
+	Name     string             `bson:"name"`
+	Location Location           `bson:"location"`
+	Email    string             `bson:"email"`
+	Address  string             `bson:"address"`
+	Phone    string             `bson:"phone"`
+	Active   bool               `bson:"active"`
 }
 
 //CompanyCreateBSON ...
