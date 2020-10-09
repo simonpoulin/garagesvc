@@ -2,7 +2,7 @@ package model
 
 // CompanyCreatePayload ...
 type CompanyCreatePayload struct {
-	Name     string   `json:"name" valid:"required, stringlength(1|20)"`
+	Name     string   `json:"name" valid:"required, stringlength(1|50)"`
 	Location Location `json:"location"`
 	Email    string   `json:"email"`
 	Phone    string   `json:"phone" valid:"type(string), stringlength(10|10)"`
@@ -11,7 +11,7 @@ type CompanyCreatePayload struct {
 
 // CompanyUpdatePayload ...
 type CompanyUpdatePayload struct {
-	Name     string   `json:"name" valid:"required, stringlength(1|20)"`
+	Name     string   `json:"name" valid:"required, stringlength(1|50)"`
 	Location Location `json:"location"`
 	Email    string   `json:"email"`
 	Address  string   `json:"address" valid:"required, stringlength(1|200)"`

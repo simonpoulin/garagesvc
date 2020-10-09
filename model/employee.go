@@ -53,7 +53,7 @@ func (payload EmployeeUpdatePayload) ConvertToUpdateBSON() (employeeBSON Employe
 	employeeBSON = EmployeeUpdateBSON{
 		Name:         payload.Name,
 		Phone:        payload.Phone,
-		Password:     util.Hash(payload.Password),
+		Password:     payload.Password,
 		Active:       payload.Active,
 		SearchString: util.ConvertToHex(payload.Name),
 	}

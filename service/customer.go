@@ -68,15 +68,21 @@ func CustomerUpdate(id primitive.ObjectID, payload model.CustomerUpdatePayload) 
 	rscfilter := bson.M{"_id": payload.ResourceObjectID}
 	resource, err := dao.ResourceFindOne(rscfilter)
 	if err != nil {
-		resource.GetDefaultResource()
+		return
 	}
 
 	//Get old customer info
 	customer, err := dao.CustomerFindOne(filter)
+	if err != nil {
+		return
+	}
 
 	//Delete old resource
-	if customer.ResourceID != blankObjectID && customer.ResourceID != payload.ResourceObjectID {
-		ResourceDelete(customer.ResourceID)
+	if customer.ResourceID != blankObjectID && customer.ResourceID != payload.ResourceObjectID && payload.ResourceObjectID != blankObjectID {
+		err = ResourceDelete(customer.ResourceID)
+		if err != nil {
+			return
+		}
 	}
 
 	//Check payload password
@@ -86,7 +92,6 @@ func CustomerUpdate(id primitive.ObjectID, payload model.CustomerUpdatePayload) 
 
 	//Set data
 	update := bson.M{"$set": payload.ConvertToUpdateBSON(resource)}
-
 	//Update customer
 	err = dao.CustomerUpdateOne(filter, update)
 
@@ -128,17 +133,16 @@ func CustomerDelete(id primitive.ObjectID) (err error) {
 
 // CustomerConvertToResponse ...
 func CustomerConvertToResponse(c model.Customer) (res model.CustomerResponse, err error) {
-	res = model.CustomerResponse{
-		ID:          c.ID,
-		Name:        c.Name,
-		Phone:       c.Phone,
-		Password:    c.Password,
-		Address:     c.Address,
-		ResourceID:  c.ResourceID,
-		SmallImage:  c.SmallImage,
-		MediumImage: c.MediumImage,
-		LargeImage:  c.LargeImage,
-	}
+
+	res.ID = c.ID
+	res.Name = c.Name
+	res.Phone = c.Phone
+	res.Password = c.Password
+	res.Address = c.Address
+	res.ResourceID = c.ResourceID
+	res.SmallImage = c.SmallImage
+	res.MediumImage = c.MediumImage
+	res.LargeImage = c.LargeImage
 
 	return
 }

@@ -12,10 +12,7 @@ import (
 
 // CompanyCreate ...
 func CompanyCreate(payload model.CompanyCreatePayload) (companyID primitive.ObjectID, err error) {
-	var company model.CompanyCreateBSON
-
-	//Set data for new company
-	company = payload.ConvertToCreateBSON()
+	var company model.CompanyCreateBSON = payload.ConvertToCreateBSON()
 
 	//Insert to database
 	err = dao.CompanyCreate(company)
@@ -130,14 +127,14 @@ func CompanyDelete(id primitive.ObjectID) (err error) {
 
 // CompanyConvertToResponse ...
 func CompanyConvertToResponse(c model.Company) (res model.CompanyResponse, err error) {
-	res = model.CompanyResponse{
-		ID:       c.ID,
-		Name:     c.Name,
-		Location: c.Location,
-		Email:    c.Email,
-		Address:  c.Address,
-		Phone:    c.Phone,
-		Active:   c.Active,
-	}
+
+	res.ID = c.ID
+	res.Name = c.Name
+	res.Location = c.Location
+	res.Email = c.Email
+	res.Address = c.Address
+	res.Phone = c.Phone
+	res.Active = c.Active
+
 	return
 }

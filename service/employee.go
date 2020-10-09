@@ -64,6 +64,17 @@ func EmployeeUpdate(id primitive.ObjectID, payload model.EmployeeUpdatePayload, 
 	//Set filter and data
 	filter := bson.M{"_id": id}
 
+	//Get old employee info
+	employee, err := dao.EmployeeFindOne(filter)
+	if err != nil {
+		return
+	}
+
+	//Check payload password
+	if employee.Password != payload.Password {
+		payload.Password = util.Hash(payload.Password)
+	}
+
 	if active != "" {
 		stt, _ := strconv.ParseBool(active)
 		update = bson.M{"$set": bson.M{"active": stt}}
@@ -92,13 +103,12 @@ func EmployeeDelete(id primitive.ObjectID) (err error) {
 
 // EmployeeConvertToResponse ...
 func EmployeeConvertToResponse(e model.Employee) (res model.EmployeeResponse, err error) {
-	res = model.EmployeeResponse{
-		ID:       e.ID,
-		Name:     e.Name,
-		Phone:    e.Phone,
-		Password: e.Password,
-		Active:   e.Active,
-	}
+
+	res.ID = e.ID
+	res.Name = e.Name
+	res.Phone = e.Phone
+	res.Password = e.Password
+	res.Active = e.Active
 
 	return
 }

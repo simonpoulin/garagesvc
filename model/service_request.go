@@ -5,7 +5,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 // ServiceCreatePayload ...
 type ServiceCreatePayload struct {
 	CompanyID       string   `json:"companyid" valid:"required, stringlength(24|24)"`
-	Name            string   `json:"name" valid:"required, stringlength(1|20)"`
+	Name            string   `json:"name" valid:"required, stringlength(1|50)"`
 	Location        Location `json:"location"`
 	Address         string   `json:"address" valid:"required, stringlength(1|200)"`
 	Phone           string   `json:"phone" valid:"type(string), stringlength(10|10)"`
@@ -16,7 +16,7 @@ type ServiceCreatePayload struct {
 
 // ServiceUpdatePayload ...
 type ServiceUpdatePayload struct {
-	Name             string   `json:"name" valid:"required, stringlength(1|20)"`
+	Name             string   `json:"name" valid:"required, stringlength(1|50)"`
 	Location         Location `json:"location" `
 	Address          string   `json:"address" valid:"required, stringlength(1|200)"`
 	Active           bool     `json:"active" valid:"required, type(bool)"`

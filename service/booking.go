@@ -12,10 +12,7 @@ import (
 // BookingCreate ...
 func BookingCreate(payload model.BookingCreatePayload, customerID primitive.ObjectID) (bookingID string, err error) {
 
-	var booking model.BookingCreateBSON
-
-	//Set data for new booking
-	booking = payload.ConvertToCreateBSON()
+	var booking model.BookingCreateBSON = payload.ConvertToCreateBSON()
 
 	//Insert to database
 	err = dao.BookingCreate(booking)

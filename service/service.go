@@ -12,10 +12,7 @@ import (
 
 // ServiceCreate ...
 func ServiceCreate(payload model.ServiceCreatePayload) (serviceID primitive.ObjectID, err error) {
-	var service model.ServiceCreateBSON
-
-	//Set data for new service
-	service = payload.ConvertToCreateBSON()
+	var service model.ServiceCreateBSON = payload.ConvertToCreateBSON()
 
 	//Insert to database
 	err = dao.ServiceCreate(service)
@@ -89,10 +86,16 @@ func ServiceUpdate(id primitive.ObjectID, payload model.ServiceUpdatePayload, ac
 
 	//Get old service info
 	service, err := dao.ServiceFindOne(filter)
+	if err != nil {
+		return
+	}
 
 	//Delete old resource
 	if service.ResourceID != blankObjectID && service.ResourceID != payload.ResourceObjectID {
-		ResourceDelete(service.ResourceID)
+		err = ResourceDelete(service.ResourceID)
+		if err != nil {
+			return
+		}
 	}
 
 	if active != "" {

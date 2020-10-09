@@ -8,14 +8,14 @@ type EmployeeLoginPayload struct {
 
 // EmployeeRegisterPayload ...
 type EmployeeRegisterPayload struct {
-	Name     string `json:"name" valid:"required, stringlength(1|20)"`
+	Name     string `json:"name" valid:"required, stringlength(1|50)"`
 	Phone    string `json:"phone" valid:"required, type(string), stringlength(10|10)"`
 	Password string `json:"password" valid:"required, type(string), stringlength(6|20)"`
 }
 
 // EmployeeUpdatePayload ...
 type EmployeeUpdatePayload struct {
-	Name     string `json:"name" valid:"required, stringlength(1|20)"`
+	Name     string `json:"name" valid:"required, stringlength(1|50)"`
 	Phone    string `json:"phone" valid:"required, type(string), stringlength(10|10)"`
 	Password string `json:"password" valid:"required, type(string), stringlength(6|50)"`
 	Active   bool   `json:"active" valid:"required, type(bool)"`

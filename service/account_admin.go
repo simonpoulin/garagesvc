@@ -12,10 +12,7 @@ import (
 
 // EmployeeRegister ...
 func EmployeeRegister(payload model.EmployeeRegisterPayload) (employeeID primitive.ObjectID, err error) {
-	var employee model.EmployeeCreateBSON
-
-	//Set data for new employee
-	employee = payload.ConvertToCreateBSON()
+	var employee model.EmployeeCreateBSON = payload.ConvertToCreateBSON()
 
 	//Insert to database
 	err = dao.EmployeeCreate(employee)

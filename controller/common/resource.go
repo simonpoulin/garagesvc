@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-//ResourceUpload ...
+// ResourceUpload ...
 func ResourceUpload(c echo.Context) error {
 	var (
 		file = c.Get("file").(*multipart.FileHeader)

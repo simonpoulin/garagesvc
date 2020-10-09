@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"garagesvc/config"
 	"garagesvc/dao"
 	"garagesvc/model"
@@ -27,11 +28,10 @@ func ResourceUpload(file *multipart.FileHeader) (resourceID primitive.ObjectID, 
 	)
 
 	// Open multipart file
-	largesrc, err := file.Open()
+	src, err := file.Open()
 	if err != nil {
 		return
 	}
-	defer largesrc.Close()
 
 	// Get file's extension
 	nameParts := strings.Split(file.Filename, ".")
@@ -49,29 +49,43 @@ func ResourceUpload(file *multipart.FileHeader) (resourceID primitive.ObjectID, 
 	env := config.GetENV()
 	imgDir := env.ImageDirectory + "/"
 
+	// Set large image destination
+	imgPath := imgDir + primitive.NewObjectID().Hex() + extension
+
+	// Create new file at destination
+	dst, err := os.Create(imgPath)
+	if err != nil {
+		return
+	}
+
+	// Copy multipart file to file at destination
+	if _, err = io.Copy(dst, src); err != nil {
+		return
+	}
+
+	src.Close()
+	dst.Close()
+
+	// Get image
+	image, err := imaging.Open(imgPath)
+	if err != nil {
+		return
+	}
+
 	// Set large image infomation
 	largeImg.ID = primitive.NewObjectID()
 	largeImg.Size.Height = 200
 	largeImg.Size.Width = 200
 	largeImg.Extension = extension
 
+	// Resize the image to width = 200px, height = 200px
+	largeImage := imaging.Resize(image, 200, 200, imaging.Lanczos)
+
 	// Set large image destination
 	largeImgPath := imgDir + largeImg.ID.Hex() + extension
 
-	// Create new file at destination
-	largeDst, err := os.Create(largeImgPath)
-	if err != nil {
-		return
-	}
-	defer largeDst.Close()
-
-	// Copy multipart file to file at destination
-	if _, err = io.Copy(largeDst, largesrc); err != nil {
-		return
-	}
-
-	// Get large image
-	largeImage, err := imaging.Open(largeImgPath)
+	// Save the resulting image
+	err = imaging.Save(largeImage, largeImgPath)
 	if err != nil {
 		return
 	}
@@ -83,7 +97,7 @@ func ResourceUpload(file *multipart.FileHeader) (resourceID primitive.ObjectID, 
 	mediumImg.Extension = extension
 
 	// Resize the image to width = 120px, height = 120px
-	mediumImage := imaging.Resize(largeImage, 120, 120, imaging.Lanczos)
+	mediumImage := imaging.Resize(image, 120, 120, imaging.Lanczos)
 
 	// Set medium image destination
 	mediumImgPath := imgDir + mediumImg.ID.Hex() + extension
@@ -101,7 +115,7 @@ func ResourceUpload(file *multipart.FileHeader) (resourceID primitive.ObjectID, 
 	smallImg.Extension = extension
 
 	// Resize the image to width = 32px, height = 32px
-	smallImage := imaging.Resize(largeImage, smallImg.Size.Width, smallImg.Size.Height, imaging.Lanczos)
+	smallImage := imaging.Resize(image, smallImg.Size.Width, smallImg.Size.Height, imaging.Lanczos)
 
 	// Set small image destination
 	smallImgPath := imgDir + smallImg.ID.Hex() + extension
@@ -120,6 +134,17 @@ func ResourceUpload(file *multipart.FileHeader) (resourceID primitive.ObjectID, 
 
 	// Add to DB
 	err = dao.ResourceCreate(resource)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	//Delete source image
+	err = os.Remove(imgPath)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
 
 	// Return resource ID
 	resourceID = resource.ID
